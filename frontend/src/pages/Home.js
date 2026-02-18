@@ -1,0 +1,199 @@
+import { Link } from 'react-router-dom';
+import { ArrowRight, Play } from 'lucide-react';
+import { motion } from 'framer-motion';
+
+const Home = () => {
+  return (
+    <div className="min-h-screen">
+      {/* Hero Section */}
+      <section className="relative h-screen flex items-center justify-center overflow-hidden">
+        {/* Background Image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: `url('https://images.unsplash.com/photo-1724138009317-04f47b288945?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzR8MHwxfHNlYXJjaHwxfHxpbmRpYW4lMjB3ZWRkaW5nJTIwY291cGxlJTIwcG9ydHJhaXQlMjBlbW90aW9ufGVufDB8fHx8MTc3MTQwNzE4MXww&ixlib=rb-4.1.0&q=85')`
+          }}
+        />
+        
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-black/60 to-transparent" />
+        
+        {/* Content */}
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.2 }}
+          className="relative z-10 text-center px-4 max-w-5xl"
+        >
+          <h1 className="font-heading text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 tracking-tight" data-testid="hero-title">
+            <span className="font-accent text-6xl sm:text-7xl lg:text-8xl text-[#D4AF37] block mb-4">Chitrakatha</span>
+            Preserving Moments That Matter Most
+          </h1>
+          <p className="text-lg md:text-xl text-[#A3A3A3] mb-10 leading-relaxed max-w-3xl mx-auto" data-testid="hero-subtitle">
+            Through real moments and raw emotion, we capture the essence of your special day with cinematic storytelling
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link
+              to="/services"
+              data-testid="cta-view-packages"
+              className="bg-[#D32F2F] text-white hover:bg-[#B71C1C] rounded-sm px-8 py-3 font-medium transition-all duration-300 flex items-center space-x-2 group"
+            >
+              <span>View Our Packages</span>
+              <ArrowRight className="group-hover:translate-x-1 transition-transform" size={20} />
+            </Link>
+            <Link
+              to="/gallery"
+              data-testid="cta-explore-gallery"
+              className="border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black rounded-sm px-8 py-3 font-medium transition-all duration-300 flex items-center space-x-2"
+            >
+              <Play size={20} />
+              <span>Explore Gallery</span>
+            </Link>
+          </div>
+        </motion.div>
+
+        {/* Scroll Indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.5, duration: 1 }}
+          className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
+        >
+          <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center">
+            <motion.div
+              animate={{ y: [0, 12, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+              className="w-1 h-3 bg-[#D32F2F] rounded-full mt-2"
+            />
+          </div>
+        </motion.div>
+      </section>
+
+      {/* Featured Work Preview */}
+      <section className="py-20 md:py-32 px-4 md:px-8 bg-[#121212]">
+        <div className="container mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="font-heading text-4xl md:text-5xl font-bold mb-4" data-testid="featured-heading">
+              Cinematic <span className="text-[#D32F2F]">Storytelling</span>
+            </h2>
+            <p className="text-lg text-[#A3A3A3] max-w-2xl mx-auto">
+              Every frame tells a story. Every moment becomes eternal.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              {
+                img: 'https://images.unsplash.com/photo-1733038378254-8d825056c249?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzR8MHwxfHNlYXJjaHwyfHxpbmRpYW4lMjB3ZWRkaW5nJTIwY291cGxlJTIwcG9ydHJhaXQlMjBlbW90aW9ufGVufDB8fHx8MTc3MTQwNzE4MXww&ixlib=rb-4.1.0&q=85',
+                title: 'Wedding Ceremonies'
+              },
+              {
+                img: 'https://images.pexels.com/photos/31832634/pexels-photo-31832634.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+                title: 'Candid Moments'
+              },
+              {
+                img: 'https://images.pexels.com/photos/31832655/pexels-photo-31832655.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+                title: 'Cinematic Films'
+              }
+            ].map((item, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: idx * 0.2 }}
+                viewport={{ once: true }}
+                className="relative group overflow-hidden cursor-pointer h-96"
+                data-testid={`featured-item-${idx}`}
+              >
+                <img
+                  src={item.img}
+                  alt={item.title}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-6">
+                  <h3 className="font-heading text-2xl font-bold text-white">{item.title}</h3>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="text-center mt-12">
+            <Link
+              to="/gallery"
+              data-testid="view-full-gallery-button"
+              className="inline-flex items-center space-x-2 border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black rounded-sm px-8 py-3 font-medium transition-all duration-300"
+            >
+              <span>View Full Gallery</span>
+              <ArrowRight size={20} />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Packages Preview */}
+      <section className="py-20 md:py-32 px-4 md:px-8">
+        <div className="container mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="font-heading text-4xl md:text-5xl font-bold mb-4" data-testid="packages-heading">
+              Our <span className="text-[#D4AF37]">Packages</span>
+            </h2>
+            <p className="text-lg text-[#A3A3A3] max-w-2xl mx-auto">
+              Choose the perfect package for your special day
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { name: 'Traditional', price: '₹70,000' },
+              { name: 'Semi-Cinematic', price: '₹80,000' },
+              { name: 'Cinematic', price: '₹90,000' },
+              { name: 'Premium', price: '₹1,20,000', highlight: true }
+            ].map((pkg, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: idx * 0.1 }}
+                viewport={{ once: true }}
+                className={`bg-[#121212] p-6 rounded-sm transition-all duration-500 hover:transform hover:scale-105 ${
+                  pkg.highlight ? 'border-2 border-[#D4AF37]' : 'border border-white/5 hover:border-[#D4AF37]/30'
+                }`}
+                data-testid={`package-preview-${pkg.name.toLowerCase().replace(' ', '-')}`}
+              >
+                <h3 className="font-heading text-2xl font-bold mb-2">{pkg.name}</h3>
+                <p className="text-3xl font-bold text-[#D32F2F] mb-4">{pkg.price}</p>
+                <p className="text-sm text-[#A3A3A3] mb-4">Starting from</p>
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="text-center mt-12">
+            <Link
+              to="/services"
+              data-testid="view-all-packages-button"
+              className="inline-flex items-center space-x-2 bg-[#D32F2F] text-white hover:bg-[#B71C1C] rounded-sm px-8 py-3 font-medium transition-all duration-300"
+            >
+              <span>View All Packages</span>
+              <ArrowRight size={20} />
+            </Link>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default Home;
