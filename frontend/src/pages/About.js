@@ -1,7 +1,30 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Camera, Film, Users, Award } from 'lucide-react';
+import axios from 'axios';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
 
 const About = () => {
+  const [aboutImage, setAboutImage] = useState('');
+
+  useEffect(() => {
+    fetchAboutImage();
+  }, []);
+
+  const fetchAboutImage = async () => {
+    try {
+      const response = await axios.get(`${API}/site-images`);
+      const images = response.data.filter(img => img.section === 'about').sort((a, b) => a.order - b.order);
+      if (images.length > 0) {
+        setAboutImage(images[0].image_url);
+      }
+    } catch (error) {
+      console.error('Error fetching about image:', error);
+    }
+  };
+
   const stats = [
     { icon: Camera, label: 'Projects Completed', value: '500+' },
     { icon: Film, label: 'Hours of Footage', value: '10,000+' },
@@ -81,7 +104,7 @@ const About = () => {
               className="relative h-96 rounded-sm overflow-hidden"
             >
               <img
-                src="https://images.pexels.com/photos/3062547/pexels-photo-3062547.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
+                src={aboutImage || 'https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/iuyyqp11_WhatsApp%20Image%202026-02-20%20at%2012.04.56%20AM%20%281%29.jpeg'}
                 alt="Chitrakatha Team"
                 className="w-full h-full object-cover"
               />
@@ -165,48 +188,6 @@ const About = () => {
               will be cherished for generations."
             </blockquote>
           </motion.div>
-        </section>
-
-        {/* Equipment Section */}
-        <section className="mt-20">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
-            <h2 className="font-heading text-3xl md:text-4xl font-bold mb-4" data-testid="equipment-title">
-              Professional <span className="text-[#D32F2F]">Equipment</span>
-            </h2>
-            <p className="text-lg text-[#A3A3A3] max-w-2xl mx-auto">
-              We use state-of-the-art cameras, lenses, and cinematic equipment to ensure the highest quality output
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 gap-6">
-            {[
-              'https://images.unsplash.com/photo-1693993367105-d2c37d9b60ce?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NzB8MHwxfHNlYXJjaHwzfHxjaW5lbWF0aWMlMjB2aWRlb2dyYXBoZXIlMjBjYW1lcmElMjBsZW5zJTIwZXF1aXBtZW50fGVufDB8fHx8MTc3MTQwNzE4Mnww&ixlib=rb-4.1.0&q=85',
-              'https://images.unsplash.com/photo-1611937542148-f39639998c03?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NzB8MHwxfHNlYXJjaHwyfHxjaW5lbWF0aWMlMjB2aWRlb2dyYXBoZXIlMjBjYW1lcmElMjBsZW5zJTIwZXF1aXBtZW50fGVufDB8fHx8MTc3MTQwNzE4Mnww&ixlib=rb-4.1.0&q=85'
-            ].map((img, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6, delay: idx * 0.2 }}
-                viewport={{ once: true }}
-                className="relative h-64 rounded-sm overflow-hidden group"
-                data-testid={`equipment-image-${idx}`}
-              >
-                <img
-                  src={img}
-                  alt={`Professional Equipment ${idx + 1}`}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-              </motion.div>
-            ))}
-          </div>
         </section>
       </div>
     </div>

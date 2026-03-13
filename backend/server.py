@@ -48,6 +48,7 @@ class User(BaseModel):
     name: str
     email: str
     phone: Optional[str] = None
+    is_admin: bool = False
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 class UserLogin(BaseModel):
@@ -109,6 +110,21 @@ class DashboardOverview(BaseModel):
     completed_projects: int
     upcoming_events: int
 
+class SiteImage(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    section: str  # hero, services, about, featured
+    image_url: str
+    alt_text: Optional[str] = None
+    order: int = 0
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+class SiteImageCreate(BaseModel):
+    section: str
+    image_url: str
+    alt_text: Optional[str] = None
+    order: int = 0
+
 # ============ AUTH UTILITIES ============
 
 def hash_password(password: str) -> str:
@@ -132,6 +148,25 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         user_id = payload.get('user_id')
         if not user_id:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+        return user_id
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+
+async def get_admin_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> str:
+    try:
+        token = credentials.credentials
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        user_id = payload.get('user_id')
+        if not user_id:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+        
+        # Check if user is admin
+        user_doc = await db.users.find_one({"id": user_id}, {"_id": 0})
+        if not user_doc or not user_doc.get('is_admin', False):
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required")
+        
         return user_id
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token expired")
@@ -192,6 +227,89 @@ async def get_current_user_info(user_id: str = Depends(get_current_user)):
     if not user_doc:
         raise HTTPException(status_code=404, detail="User not found")
     return User(**user_doc)
+
+# ============ ADMIN ROUTES ============
+
+@api_router.post("/admin/login", response_model=LoginResponse)
+async def admin_login(login_data: UserLogin):
+    # Find user
+    user_doc = await db.users.find_one({"email": login_data.email}, {"_id": 0})
+    if not user_doc:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    
+    # Verify password
+    if not verify_password(login_data.password, user_doc['password']):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    
+    # Check if admin
+    if not user_doc.get('is_admin', False):
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    # Create user object (without password)
+    user_doc.pop('password', None)
+    user_obj = User(**user_doc)
+    
+    # Generate token
+    token = create_jwt_token(user_obj.id)
+    
+    return LoginResponse(token=token, user=user_obj)
+
+@api_router.get("/admin/gallery", response_model=List[GalleryItem])
+async def admin_get_gallery(user_id: str = Depends(get_admin_user)):
+    items = await db.gallery.find({}, {"_id": 0}).to_list(1000)
+    return [GalleryItem(**item) for item in items]
+
+@api_router.delete("/admin/gallery/{item_id}")
+async def admin_delete_gallery_item(item_id: str, user_id: str = Depends(get_admin_user)):
+    result = await db.gallery.delete_one({"id": item_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Gallery item not found")
+    return {"message": "Gallery item deleted successfully"}
+
+@api_router.post("/admin/gallery", response_model=GalleryItem)
+async def admin_create_gallery_item(item: GalleryItem, user_id: str = Depends(get_admin_user)):
+    item_dict = item.model_dump()
+    await db.gallery.insert_one(item_dict)
+    return item
+
+@api_router.get("/admin/site-images", response_model=List[SiteImage])
+async def admin_get_site_images(user_id: str = Depends(get_admin_user)):
+    images = await db.site_images.find({}, {"_id": 0}).to_list(1000)
+    return [SiteImage(**img) for img in images]
+
+@api_router.post("/admin/site-images", response_model=SiteImage)
+async def admin_create_site_image(image: SiteImageCreate, user_id: str = Depends(get_admin_user)):
+    image_obj = SiteImage(**image.model_dump())
+    image_dict = image_obj.model_dump()
+    await db.site_images.insert_one(image_dict)
+    return image_obj
+
+@api_router.delete("/admin/site-images/{image_id}")
+async def admin_delete_site_image(image_id: str, user_id: str = Depends(get_admin_user)):
+    result = await db.site_images.delete_one({"id": image_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Site image not found")
+    return {"message": "Site image deleted successfully"}
+
+@api_router.put("/admin/site-images/bulk")
+async def admin_update_site_images_bulk(images: List[SiteImageCreate], user_id: str = Depends(get_admin_user)):
+    # Delete all existing site images
+    await db.site_images.delete_many({})
+    
+    # Insert new images
+    created_images = []
+    for img_data in images:
+        img_obj = SiteImage(**img_data.model_dump())
+        img_dict = img_obj.model_dump()
+        await db.site_images.insert_one(img_dict)
+        created_images.append(img_obj)
+    
+    return {"message": f"Updated {len(created_images)} site images", "images": created_images}
+
+@api_router.get("/site-images")
+async def get_site_images():
+    images = await db.site_images.find({}, {"_id": 0}).to_list(1000)
+    return [SiteImage(**img) for img in images]
 
 # ============ DASHBOARD ROUTES ============
 
@@ -298,6 +416,140 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+
+@app.on_event("startup")
+async def startup_event():
+    """Create default admin user and seed initial images"""
+    # Create admin user if not exists
+    admin_email = "admin@chitrakatha.com"
+    existing_admin = await db.users.find_one({"email": admin_email}, {"_id": 0})
+    
+    if not existing_admin:
+        admin_user = User(
+            name="Admin",
+            email=admin_email,
+            is_admin=True
+        )
+        admin_dict = admin_user.model_dump()
+        admin_dict['password'] = hash_password("admin123")  # Default password
+        await db.users.insert_one(admin_dict)
+        logger.info(f"Admin user created: {admin_email} / admin123")
+    
+    # Seed initial site images if none exist
+    existing_images = await db.site_images.count_documents({})
+    if existing_images == 0:
+        initial_images = [
+            # Hero images
+            SiteImage(
+                section="hero",
+                image_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/nd8u6n4a_WhatsApp%20Image%202026-02-18%20at%206.22.32%20PM.jpeg",
+                alt_text="Beautiful Indian bride",
+                order=0
+            ),
+            SiteImage(
+                section="hero",
+                image_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/2y1wmxgm_WhatsApp%20Image%202026-02-20%20at%2012.04.55%20AM%20%282%29.jpeg",
+                alt_text="Romantic couple portrait",
+                order=1
+            ),
+            # Featured work
+            SiteImage(
+                section="featured",
+                image_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/rev1u9a6_WhatsApp%20Image%202026-02-20%20at%2012.04.55%20AM.jpeg",
+                alt_text="Pre-wedding couple photo",
+                order=0
+            ),
+            SiteImage(
+                section="featured",
+                image_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/iuyyqp11_WhatsApp%20Image%202026-02-20%20at%2012.04.56%20AM%20%281%29.jpeg",
+                alt_text="Haldi ceremony celebration",
+                order=1
+            ),
+            SiteImage(
+                section="featured",
+                image_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/7kr5tkeu_WhatsApp%20Image%202026-02-20%20at%2012.04.56%20AM.jpeg",
+                alt_text="Wedding group photo",
+                order=2
+            ),
+            # Service images
+            SiteImage(
+                section="services",
+                image_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/nd8u6n4a_WhatsApp%20Image%202026-02-18%20at%206.22.32%20PM.jpeg",
+                alt_text="Traditional package",
+                order=0
+            ),
+            SiteImage(
+                section="services",
+                image_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/2y1wmxgm_WhatsApp%20Image%202026-02-20%20at%2012.04.55%20AM%20%282%29.jpeg",
+                alt_text="Semi-Cinematic package",
+                order=1
+            ),
+            SiteImage(
+                section="services",
+                image_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/rev1u9a6_WhatsApp%20Image%202026-02-20%20at%2012.04.55%20AM.jpeg",
+                alt_text="Cinematic package",
+                order=2
+            ),
+            SiteImage(
+                section="services",
+                image_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/7kr5tkeu_WhatsApp%20Image%202026-02-20%20at%2012.04.56%20AM.jpeg",
+                alt_text="Premium package",
+                order=3
+            ),
+            # About page
+            SiteImage(
+                section="about",
+                image_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/iuyyqp11_WhatsApp%20Image%202026-02-20%20at%2012.04.56%20AM%20%281%29.jpeg",
+                alt_text="Our team at work",
+                order=0
+            )
+        ]
+        
+        for img in initial_images:
+            await db.site_images.insert_one(img.model_dump())
+        
+        logger.info(f"Seeded {len(initial_images)} initial site images")
+    
+    # Seed initial gallery items
+    existing_gallery = await db.gallery.count_documents({})
+    if existing_gallery == 0:
+        gallery_items = [
+            GalleryItem(
+                title="Beautiful Bride Portrait",
+                category="Wedding",
+                media_type="photo",
+                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/nd8u6n4a_WhatsApp%20Image%202026-02-18%20at%206.22.32%20PM.jpeg"
+            ),
+            GalleryItem(
+                title="Romantic Pre-Wedding Shoot",
+                category="Pre-Wedding",
+                media_type="photo",
+                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/2y1wmxgm_WhatsApp%20Image%202026-02-20%20at%2012.04.55%20AM%20%282%29.jpeg"
+            ),
+            GalleryItem(
+                title="Couple Portrait Session",
+                category="Pre-Wedding",
+                media_type="photo",
+                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/rev1u9a6_WhatsApp%20Image%202026-02-20%20at%2012.04.55%20AM.jpeg"
+            ),
+            GalleryItem(
+                title="Haldi Ceremony Celebration",
+                category="Wedding",
+                media_type="photo",
+                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/iuyyqp11_WhatsApp%20Image%202026-02-20%20at%2012.04.56%20AM%20%281%29.jpeg"
+            ),
+            GalleryItem(
+                title="Wedding Day Group Photo",
+                category="Wedding",
+                media_type="photo",
+                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/7kr5tkeu_WhatsApp%20Image%202026-02-20%20at%2012.04.56%20AM.jpeg"
+            )
+        ]
+        
+        for item in gallery_items:
+            await db.gallery.insert_one(item.model_dump())
+        
+        logger.info(f"Seeded {len(gallery_items)} initial gallery items")
 
 @app.on_event("shutdown")
 async def shutdown_db_client():

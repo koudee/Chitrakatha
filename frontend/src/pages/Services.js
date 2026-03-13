@@ -1,17 +1,35 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Check, Plus } from 'lucide-react';
-import { useState } from 'react';
 import { toast } from 'sonner';
+import axios from 'axios';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
 
 const Services = () => {
   const [selectedPackage, setSelectedPackage] = useState(null);
+  const [serviceImages, setServiceImages] = useState([]);
+
+  useEffect(() => {
+    fetchServiceImages();
+  }, []);
+
+  const fetchServiceImages = async () => {
+    try {
+      const response = await axios.get(`${API}/site-images`);
+      const images = response.data.filter(img => img.section === 'services').sort((a, b) => a.order - b.order);
+      setServiceImages(images);
+    } catch (error) {
+      console.error('Error fetching service images:', error);
+    }
+  };
 
   const packages = [
     {
       name: 'Traditional',
       price: 70000,
       duration: '3 Days Coverage',
-      image: 'https://images.unsplash.com/photo-1733038378254-8d825056c249?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzR8MHwxfHNlYXJjaHwyfHxpbmRpYW4lMjB3ZWRkaW5nJTIwY291cGxlJTIwcG9ydHJhaXQlMjBlbW90aW9ufGVufDB8fHx8MTc3MTQwNzE4MXww&ixlib=rb-4.1.0&q=85',
       features: [
         '2 x 20 Sheets NT Glossy Album with bag (18" X 12")',
         '120 Edited Photos per album',
@@ -26,7 +44,6 @@ const Services = () => {
       name: 'Semi-Cinematic',
       price: 80000,
       duration: '4 Days Coverage',
-      image: 'https://images.pexels.com/photos/31832634/pexels-photo-31832634.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
       features: [
         '2 x 25 Sheets NT Glossy Album with Leather bag (18" X 12")',
         '150 Edited Photos per album',
@@ -42,7 +59,6 @@ const Services = () => {
       name: 'Cinematic',
       price: 90000,
       duration: '4 Days Coverage',
-      image: 'https://images.pexels.com/photos/31832655/pexels-photo-31832655.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
       features: [
         '2 x 25 Sheets Exclusive Album (18" X 12")',
         '150 High End Edited Photos each side',
@@ -62,7 +78,6 @@ const Services = () => {
       price: 120000,
       duration: '4 Days Coverage',
       highlight: true,
-      image: 'https://images.unsplash.com/photo-1724138009317-04f47b288945?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzR8MHwxfHNlYXJjaHwxfHxpbmRpYW4lMjB3ZWRkaW5nJTIwY291cGxlJTIwcG9ydHJhaXQlMjBlbW90aW9ufGVufDB8fHx8MTc3MTQwNzE4MXww&ixlib=rb-4.1.0&q=85',
       features: [
         '30 Sheets Exclusive Album (18" X 12")',
         '200 High End Edited photos for each album',
@@ -130,7 +145,7 @@ const Services = () => {
               {/* Package Image */}
               <div className="relative h-48 overflow-hidden">
                 <img
-                  src={pkg.image}
+                  src={serviceImages[idx]?.image_url || ''}
                   alt={pkg.name}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />

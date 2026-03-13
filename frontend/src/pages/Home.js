@@ -1,8 +1,44 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Play } from 'lucide-react';
 import { motion } from 'framer-motion';
+import axios from 'axios';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
 
 const Home = () => {
+  const [heroImage, setHeroImage] = useState('');
+  const [featuredImages, setFeaturedImages] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchSiteImages();
+  }, []);
+
+  const fetchSiteImages = async () => {
+    try {
+      const response = await axios.get(`${API}/site-images`);
+      const images = response.data;
+      
+      // Get hero images (use first one as main hero)
+      const heroImgs = images.filter(img => img.section === 'hero').sort((a, b) => a.order - b.order);
+      if (heroImgs.length > 0) {
+        setHeroImage(heroImgs[0].image_url);
+      }
+      
+      // Get featured images
+      const featured = images.filter(img => img.section === 'featured').sort((a, b) => a.order - b.order).slice(0, 3);
+      setFeaturedImages(featured);
+    } catch (error) {
+      console.error('Error fetching site images:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const featuredTitles = ['Wedding Ceremonies', 'Candid Moments', 'Cinematic Films'];
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -11,7 +47,8 @@ const Home = () => {
         <div 
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1724138009317-04f47b288945?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzR8MHwxfHNlYXJjaHwxfHxpbmRpYW4lMjB3ZWRkaW5nJTIwY291cGxlJTIwcG9ydHJhaXQlMjBlbW90aW9ufGVufDB8fHx8MTc3MTQwNzE4MXww&ixlib=rb-4.1.0&q=85')`
+            backgroundImage: heroImage ? `url('${heroImage}')` : 'none',
+            backgroundColor: heroImage ? 'transparent' : '#121212'
           }}
         />
         
@@ -88,40 +125,33 @@ const Home = () => {
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              {
-                img: 'https://images.unsplash.com/photo-1733038378254-8d825056c249?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzR8MHwxfHNlYXJjaHwyfHxpbmRpYW4lMjB3ZWRkaW5nJTIwY291cGxlJTIwcG9ydHJhaXQlMjBlbW90aW9ufGVufDB8fHx8MTc3MTQwNzE4MXww&ixlib=rb-4.1.0&q=85',
-                title: 'Wedding Ceremonies'
-              },
-              {
-                img: 'https://images.pexels.com/photos/31832634/pexels-photo-31832634.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
-                title: 'Candid Moments'
-              },
-              {
-                img: 'https://images.pexels.com/photos/31832655/pexels-photo-31832655.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
-                title: 'Cinematic Films'
-              }
-            ].map((item, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: idx * 0.2 }}
-                viewport={{ once: true }}
-                className="relative group overflow-hidden cursor-pointer h-96"
-                data-testid={`featured-item-${idx}`}
-              >
-                <img
-                  src={item.img}
-                  alt={item.title}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <h3 className="font-heading text-2xl font-bold text-white">{item.title}</h3>
-                </div>
-              </motion.div>
-            ))}
+            {featuredImages.length > 0 ? (
+              featuredImages.map((item, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: idx * 0.2 }}
+                  viewport={{ once: true }}
+                  className="relative group overflow-hidden cursor-pointer h-96"
+                  data-testid={`featured-item-${idx}`}
+                >
+                  <img
+                    src={item.image_url}
+                    alt={item.alt_text || featuredTitles[idx]}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-6">
+                    <h3 className="font-heading text-2xl font-bold text-white">{item.alt_text || featuredTitles[idx]}</h3>
+                  </div>
+                </motion.div>
+              ))
+            ) : (
+              <div className="col-span-3 text-center py-20">
+                <p className="text-[#A3A3A3]">Loading featured work...</p>
+              </div>
+            )}
           </div>
 
           <div className="text-center mt-12">
