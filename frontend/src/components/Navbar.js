@@ -1,13 +1,36 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, LogOut } from 'lucide-react';
-import { useState } from 'react';
+import { Menu, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar = ({ isAuthenticated, onLogout }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
   const location = useLocation();
 
   const isActive = (path) => location.pathname === path;
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      // Show/hide navbar based on scroll direction
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        setHidden(true); // Scrolling down
+      } else {
+        setHidden(false); // Scrolling up
+      }
+      
+      // Add background when scrolled
+      setScrolled(currentScrollY > 50);
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
 
   const publicLinks = [
     { path: '/', label: 'Home' },
@@ -17,63 +40,70 @@ const Navbar = ({ isAuthenticated, onLogout }) => {
   ];
 
   return (
-    <nav className="fixed top-0 w-full z-50 backdrop-blur-md bg-black/50 border-b border-white/5">
-      <div className="container mx-auto px-4 md:px-8">
-        <div className="flex items-center justify-between h-20">
+    <motion.nav
+      initial={{ y: 0 }}
+      animate={{ y: hidden ? -100 : 0 }}
+      transition={{ duration: 0.3 }}
+      className={`fixed top-0 w-full z-50 transition-all duration-500 ${
+        scrolled 
+          ? 'bg-black/95 backdrop-blur-lg border-b border-white/10 shadow-xl' 
+          : 'bg-transparent'
+      }`}
+      data-testid="navbar"
+    >
+      <div className="container mx-auto px-6 md:px-12">
+        <div className="flex items-center justify-between h-24">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-3" data-testid="navbar-logo">
-            <img 
+          <Link to="/" className="flex items-center space-x-3 group" data-testid="navbar-logo">
+            <motion.img 
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.2 }}
               src="https://customer-assets.emergentagent.com/job_084c5691-4eb2-4ffe-b321-0ad44c35e91c/artifacts/tkvjrxz5_WhatsApp%20Image%202026-02-18%20at%202.55.27%20PM.jpeg"
               alt="Chitrakatha Logo"
-              className="h-12 w-auto object-contain"
+              className="h-14 w-auto object-contain"
             />
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden lg:flex items-center space-x-2">
             {publicLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
                 data-testid={`nav-link-${link.label.toLowerCase()}`}
-                className={`text-sm uppercase tracking-widest transition-colors duration-300 ${
+                className="relative group px-6 py-3"
+              >
+                <span className={`text-sm font-medium uppercase tracking-[0.2em] transition-colors duration-300 ${
                   isActive(link.path)
                     ? 'text-[#D32F2F]'
-                    : 'text-white hover:text-[#D32F2F]'
-                }`}
-              >
-                {link.label}
+                    : 'text-white/90 group-hover:text-white'
+                }`}>
+                  {link.label}
+                </span>
+                {/* Elegant underline animation */}
+                <motion.div
+                  className="absolute bottom-2 left-6 right-6 h-[2px] bg-gradient-to-r from-[#D32F2F] to-[#D4AF37]"
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: isActive(link.path) ? 1 : 0 }}
+                  whileHover={{ scaleX: 1 }}
+                  transition={{ duration: 0.3 }}
+                  style={{ originX: 0 }}
+                />
               </Link>
             ))}
-            {isAuthenticated ? (
-              <>
-                <Link
-                  to="/dashboard"
-                  data-testid="nav-link-dashboard"
-                  className={`text-sm uppercase tracking-widest transition-colors duration-300 ${
-                    isActive('/dashboard')
-                      ? 'text-[#D32F2F]'
-                      : 'text-white hover:text-[#D32F2F]'
-                  }`}
-                >
-                  Dashboard
-                </Link>
-                <button
-                  onClick={onLogout}
-                  data-testid="logout-button"
-                  className="flex items-center space-x-2 text-sm uppercase tracking-widest text-white hover:text-[#D32F2F] transition-colors duration-300"
-                >
-                  <LogOut size={16} />
-                  <span>Logout</span>
-                </button>
-              </>
-            ) : (
+            
+            {/* Dashboard button for authenticated users - more subtle */}
+            {isAuthenticated && (
               <Link
-                to="/login"
-                data-testid="nav-link-login"
-                className="bg-[#D32F2F] text-white hover:bg-[#B71C1C] rounded-sm px-6 py-2 font-medium transition-all duration-300 text-sm uppercase tracking-widest"
+                to="/dashboard"
+                data-testid="nav-link-dashboard"
+                className={`ml-4 px-6 py-3 rounded-sm border transition-all duration-300 ${
+                  isActive('/dashboard')
+                    ? 'bg-[#D32F2F] border-[#D32F2F] text-white'
+                    : 'border-[#D4AF37]/30 text-[#D4AF37] hover:bg-[#D4AF37]/10 hover:border-[#D4AF37]'
+                }`}
               >
-                Login
+                <span className="text-sm font-medium uppercase tracking-widest">Dashboard</span>
               </Link>
             )}
           </div>
@@ -82,9 +112,9 @@ const Navbar = ({ isAuthenticated, onLogout }) => {
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             data-testid="mobile-menu-toggle"
-            className="md:hidden text-white p-2"
+            className="lg:hidden text-white p-2 hover:bg-white/10 rounded-sm transition-colors"
           >
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
           </button>
         </div>
 
@@ -95,58 +125,36 @@ const Navbar = ({ isAuthenticated, onLogout }) => {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="md:hidden overflow-hidden"
+              className="lg:hidden overflow-hidden bg-black/95 backdrop-blur-lg rounded-b-lg"
             >
-              <div className="py-4 space-y-4">
+              <div className="py-6 space-y-2 px-4">
                 {publicLinks.map((link) => (
                   <Link
                     key={link.path}
                     to={link.path}
                     onClick={() => setMobileMenuOpen(false)}
                     data-testid={`mobile-nav-link-${link.label.toLowerCase()}`}
-                    className={`block text-sm uppercase tracking-widest transition-colors duration-300 ${
+                    className={`block px-4 py-3 rounded-sm text-sm uppercase tracking-widest transition-all duration-300 ${
                       isActive(link.path)
-                        ? 'text-[#D32F2F]'
-                        : 'text-white hover:text-[#D32F2F]'
+                        ? 'bg-[#D32F2F] text-white'
+                        : 'text-white/90 hover:bg-white/5 hover:text-white'
                     }`}
                   >
                     {link.label}
                   </Link>
                 ))}
-                {isAuthenticated ? (
-                  <>
-                    <Link
-                      to="/dashboard"
-                      onClick={() => setMobileMenuOpen(false)}
-                      data-testid="mobile-nav-link-dashboard"
-                      className={`block text-sm uppercase tracking-widest transition-colors duration-300 ${
-                        isActive('/dashboard')
-                          ? 'text-[#D32F2F]'
-                          : 'text-white hover:text-[#D32F2F]'
-                      }`}
-                    >
-                      Dashboard
-                    </Link>
-                    <button
-                      onClick={() => {
-                        onLogout();
-                        setMobileMenuOpen(false);
-                      }}
-                      data-testid="mobile-logout-button"
-                      className="flex items-center space-x-2 text-sm uppercase tracking-widest text-white hover:text-[#D32F2F] transition-colors duration-300"
-                    >
-                      <LogOut size={16} />
-                      <span>Logout</span>
-                    </button>
-                  </>
-                ) : (
+                {isAuthenticated && (
                   <Link
-                    to="/login"
+                    to="/dashboard"
                     onClick={() => setMobileMenuOpen(false)}
-                    data-testid="mobile-nav-link-login"
-                    className="inline-block bg-[#D32F2F] text-white hover:bg-[#B71C1C] rounded-sm px-6 py-2 font-medium transition-all duration-300 text-sm uppercase tracking-widest"
+                    data-testid="mobile-nav-link-dashboard"
+                    className={`block px-4 py-3 rounded-sm text-sm uppercase tracking-widest transition-all duration-300 ${
+                      isActive('/dashboard')
+                        ? 'bg-[#D32F2F] text-white'
+                        : 'text-[#D4AF37] hover:bg-[#D4AF37]/10'
+                    }`}
                   >
-                    Login
+                    Dashboard
                   </Link>
                 )}
               </div>
@@ -154,7 +162,7 @@ const Navbar = ({ isAuthenticated, onLogout }) => {
           )}
         </AnimatePresence>
       </div>
-    </nav>
+    </motion.nav>
   );
 };
 

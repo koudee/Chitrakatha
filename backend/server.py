@@ -442,33 +442,33 @@ async def startup_event():
             # Hero images
             SiteImage(
                 section="hero",
-                image_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/nd8u6n4a_WhatsApp%20Image%202026-02-18%20at%206.22.32%20PM.jpeg",
-                alt_text="Beautiful Indian bride",
+                image_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/3c6lzonb_WhatsApp%20Image%202026-02-18%20at%206.22.33%20PM%20%281%29.jpeg",
+                alt_text="Elegant Bridal Portrait",
                 order=0
             ),
             SiteImage(
                 section="hero",
-                image_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/2y1wmxgm_WhatsApp%20Image%202026-02-20%20at%2012.04.55%20AM%20%282%29.jpeg",
-                alt_text="Romantic couple portrait",
+                image_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/u1naa4w7_WhatsApp%20Image%202026-02-20%20at%2012.04.55%20AM%20%282%29.jpeg",
+                alt_text="Romantic Couple at Archway",
                 order=1
             ),
             # Featured work
             SiteImage(
                 section="featured",
-                image_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/rev1u9a6_WhatsApp%20Image%202026-02-20%20at%2012.04.55%20AM.jpeg",
-                alt_text="Pre-wedding couple photo",
+                image_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/520ttye7_WhatsApp%20Image%202026-02-20%20at%2012.04.55%20AM%20%281%29.jpeg",
+                alt_text="Pre-wedding couple portrait",
                 order=0
             ),
             SiteImage(
                 section="featured",
-                image_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/iuyyqp11_WhatsApp%20Image%202026-02-20%20at%2012.04.56%20AM%20%281%29.jpeg",
-                alt_text="Haldi ceremony celebration",
+                image_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/zf1vnqdd_WhatsApp%20Image%202026-02-20%20at%2012.04.57%20AM.jpeg",
+                alt_text="Joyful wedding celebration",
                 order=1
             ),
             SiteImage(
                 section="featured",
-                image_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/7kr5tkeu_WhatsApp%20Image%202026-02-20%20at%2012.04.56%20AM.jpeg",
-                alt_text="Wedding group photo",
+                image_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/7jad38aw_WhatsApp%20Image%202026-02-18%20at%206.22.33%20PM.jpeg",
+                alt_text="Artistic bridal portrait",
                 order=2
             ),
             # Service images
@@ -480,27 +480,27 @@ async def startup_event():
             ),
             SiteImage(
                 section="services",
-                image_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/2y1wmxgm_WhatsApp%20Image%202026-02-20%20at%2012.04.55%20AM%20%282%29.jpeg",
+                image_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/3c6lzonb_WhatsApp%20Image%202026-02-18%20at%206.22.33%20PM%20%281%29.jpeg",
                 alt_text="Semi-Cinematic package",
                 order=1
             ),
             SiteImage(
                 section="services",
-                image_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/rev1u9a6_WhatsApp%20Image%202026-02-20%20at%2012.04.55%20AM.jpeg",
+                image_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/520ttye7_WhatsApp%20Image%202026-02-20%20at%2012.04.55%20AM%20%281%29.jpeg",
                 alt_text="Cinematic package",
                 order=2
             ),
             SiteImage(
                 section="services",
-                image_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/7kr5tkeu_WhatsApp%20Image%202026-02-20%20at%2012.04.56%20AM.jpeg",
+                image_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/u1naa4w7_WhatsApp%20Image%202026-02-20%20at%2012.04.55%20AM%20%282%29.jpeg",
                 alt_text="Premium package",
                 order=3
             ),
             # About page
             SiteImage(
                 section="about",
-                image_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/iuyyqp11_WhatsApp%20Image%202026-02-20%20at%2012.04.56%20AM%20%281%29.jpeg",
-                alt_text="Our team at work",
+                image_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/zf1vnqdd_WhatsApp%20Image%202026-02-20%20at%2012.04.57%20AM.jpeg",
+                alt_text="Our team capturing moments",
                 order=0
             )
         ]
@@ -514,6 +514,7 @@ async def startup_event():
     existing_gallery = await db.gallery.count_documents({})
     if existing_gallery == 0:
         gallery_items = [
+            # First set of images
             GalleryItem(
                 title="Beautiful Bride Portrait",
                 category="Wedding",
@@ -543,6 +544,37 @@ async def startup_event():
                 category="Wedding",
                 media_type="photo",
                 media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/7kr5tkeu_WhatsApp%20Image%202026-02-20%20at%2012.04.56%20AM.jpeg"
+            ),
+            # New set of images
+            GalleryItem(
+                title="Elegant Bridal Portrait",
+                category="Wedding",
+                media_type="photo",
+                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/3c6lzonb_WhatsApp%20Image%202026-02-18%20at%206.22.33%20PM%20%281%29.jpeg"
+            ),
+            GalleryItem(
+                title="Artistic Bride Close-up",
+                category="Portrait",
+                media_type="photo",
+                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/7jad38aw_WhatsApp%20Image%202026-02-18%20at%206.22.33%20PM.jpeg"
+            ),
+            GalleryItem(
+                title="Pre-Wedding Couple in Black",
+                category="Pre-Wedding",
+                media_type="photo",
+                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/520ttye7_WhatsApp%20Image%202026-02-20%20at%2012.04.55%20AM%20%281%29.jpeg"
+            ),
+            GalleryItem(
+                title="Romantic Archway Moment",
+                category="Pre-Wedding",
+                media_type="photo",
+                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/u1naa4w7_WhatsApp%20Image%202026-02-20%20at%2012.04.55%20AM%20%282%29.jpeg"
+            ),
+            GalleryItem(
+                title="Joyful Wedding Celebration",
+                category="Wedding",
+                media_type="photo",
+                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/zf1vnqdd_WhatsApp%20Image%202026-02-20%20at%2012.04.57%20AM.jpeg"
             )
         ]
         
