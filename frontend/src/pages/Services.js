@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Check, Plus, Tag } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Check, Plus, Tag, X, Phone, Mail, MessageCircle, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import axios from 'axios';
 
@@ -9,6 +9,8 @@ const API = `${BACKEND_URL}/api`;
 
 const Services = () => {
   const [selectedPackage, setSelectedPackage] = useState(null);
+  const [selectedAddOns, setSelectedAddOns] = useState([]);
+  const [showContactModal, setShowContactModal] = useState(false);
   const [serviceImages, setServiceImages] = useState([]);
 
   useEffect(() => {
@@ -23,6 +25,34 @@ const Services = () => {
     } catch (error) {
       console.error('Error fetching service images:', error);
     }
+  };
+
+  const toggleAddOn = (addon) => {
+    setSelectedAddOns(prev => {
+      const exists = prev.find(item => item.name === addon.name);
+      if (exists) {
+        toast.info(`${addon.name} removed`);
+        return prev.filter(item => item.name !== addon.name);
+      } else {
+        toast.success(`${addon.name} added - ₹${addon.price.toLocaleString()}`);
+        return [...prev, addon];
+      }
+    });
+  };
+
+  const isAddOnSelected = (addonName) => {
+    return selectedAddOns.some(item => item.name === addonName);
+  };
+
+  const calculateTotal = () => {
+    const packagePrice = selectedPackage ? selectedPackage.price : 0;
+    const addOnsTotal = selectedAddOns.reduce((sum, addon) => sum + addon.price, 0);
+    return packagePrice + addOnsTotal;
+  };
+
+  const handleBookPackage = (pkg) => {
+    setSelectedPackage(pkg);
+    setShowContactModal(true);
   };
 
   const packages = [
@@ -151,11 +181,6 @@ const Services = () => {
     }
   ];
 
-  const handleBookPackage = (pkg) => {
-    setSelectedPackage(pkg);
-    toast.success(`You selected ${pkg.name} package! Please login or register to complete booking.`);
-  };
-
   return (
     <div className="min-h-screen pt-32 pb-20 px-4 md:px-8">
       <div className="container mx-auto">
@@ -192,7 +217,6 @@ const Services = () => {
               } transition-all duration-500`}
               data-testid={`package-${pkg.name.toLowerCase().replace(' ', '-')}`}
             >
-              {/* Package Image */}
               <div className="relative h-48 overflow-hidden">
                 <img
                   src={serviceImages[idx]?.image_url || ''}
@@ -205,18 +229,15 @@ const Services = () => {
                     Most Popular
                   </div>
                 )}
-                {/* Discount Badge */}
                 <div className="absolute top-4 left-4 bg-[#D32F2F] text-white px-3 py-1 rounded-sm text-xs font-bold">
                   {pkg.discount}% OFF
                 </div>
               </div>
 
-              {/* Package Content */}
               <div className="p-6">
                 <h3 className="font-heading text-2xl font-bold mb-2" data-testid={`package-name-${idx}`}>{pkg.name}</h3>
                 <p className="text-sm text-[#A3A3A3] mb-4">{pkg.duration}</p>
                 
-                {/* Pricing with strikethrough */}
                 <div className="mb-4">
                   <div className="flex items-center space-x-3 mb-1">
                     <span className="text-lg text-[#A3A3A3] line-through">₹{(pkg.originalPrice / 1000).toFixed(0)}k</span>
@@ -225,7 +246,6 @@ const Services = () => {
                   <p className="text-xs text-[#D4AF37]">Save ₹{((pkg.originalPrice - pkg.price) / 1000).toFixed(0)}k • Both Sides</p>
                 </div>
 
-                {/* Features */}
                 <ul className="space-y-3 mb-6">
                   {pkg.features.map((feature, fidx) => (
                     <li key={fidx} className="flex items-start text-sm text-[#A3A3A3]">
@@ -259,38 +279,201 @@ const Services = () => {
           viewport={{ once: true }}
           className="mb-20"
         >
-          <h2 className="font-heading text-3xl md:text-4xl font-bold mb-8 text-center" data-testid="addon-services-title">
+          <h2 className="font-heading text-3xl md:text-4xl font-bold mb-4 text-center" data-testid="addon-services-title">
             Add-On <span className="text-[#D32F2F]">Services</span>
           </h2>
+          <p className="text-center text-[#A3A3A3] mb-8">Click + to add services to your package</p>
+          
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {addOns.map((addon, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: idx * 0.05 }}
-                viewport={{ once: true }}
-                className="bg-[#121212] border border-white/5 p-6 rounded-sm hover:border-[#D32F2F]/30 transition-all duration-300"
-                data-testid={`addon-${idx}`}
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <h3 className="font-heading text-lg font-bold flex-1">{addon.name}</h3>
-                  <Plus size={20} className="text-[#D4AF37] flex-shrink-0 ml-2" />
-                </div>
-                <p className="text-sm text-[#A3A3A3] mb-4">{addon.description}</p>
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm text-[#A3A3A3] line-through">₹{addon.originalPrice.toLocaleString()}</span>
-                  <span className="text-2xl font-bold text-[#D32F2F]">₹{addon.price.toLocaleString()}</span>
-                </div>
-                {addon.originalPrice > addon.price && (
-                  <p className="text-xs text-[#D4AF37] mt-1">Save ₹{(addon.originalPrice - addon.price).toLocaleString()}</p>
-                )}
-              </motion.div>
-            ))}
+            {addOns.map((addon, idx) => {
+              const isSelected = isAddOnSelected(addon.name);
+              return (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: idx * 0.05 }}
+                  viewport={{ once: true }}
+                  className={`bg-[#121212] border p-6 rounded-sm transition-all duration-300 cursor-pointer ${
+                    isSelected 
+                      ? 'border-[#D4AF37] shadow-lg shadow-[#D4AF37]/20' 
+                      : 'border-white/5 hover:border-[#D32F2F]/30'
+                  }`}
+                  onClick={() => toggleAddOn(addon)}
+                  data-testid={`addon-${idx}`}
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <h3 className="font-heading text-lg font-bold flex-1">{addon.name}</h3>
+                    <button
+                      className={`flex-shrink-0 ml-2 transition-all duration-300 ${
+                        isSelected 
+                          ? 'text-[#D4AF37] rotate-45' 
+                          : 'text-[#D4AF37] hover:scale-110'
+                      }`}
+                    >
+                      {isSelected ? <CheckCircle size={24} fill="#D4AF37" /> : <Plus size={20} />}
+                    </button>
+                  </div>
+                  <p className="text-sm text-[#A3A3A3] mb-4">{addon.description}</p>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm text-[#A3A3A3] line-through">₹{addon.originalPrice.toLocaleString()}</span>
+                    <span className="text-2xl font-bold text-[#D32F2F]">₹{addon.price.toLocaleString()}</span>
+                  </div>
+                  {addon.originalPrice > addon.price && (
+                    <p className="text-xs text-[#D4AF37] mt-1">Save ₹{(addon.originalPrice - addon.price).toLocaleString()}</p>
+                  )}
+                </motion.div>
+              );
+            })}
           </div>
         </motion.div>
 
-        {/* Terms & Payment */}
+        {/* Selected Services Summary - Floating */}
+        {(selectedPackage || selectedAddOns.length > 0) && (
+          <motion.div
+            initial={{ opacity: 0, y: 100 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="fixed bottom-8 right-8 bg-[#121212] border-2 border-[#D4AF37] rounded-sm p-6 shadow-2xl shadow-[#D4AF37]/30 max-w-md z-40"
+          >
+            <h3 className="font-heading text-xl font-bold mb-4 flex items-center space-x-2">
+              <Tag className="text-[#D4AF37]" />
+              <span>Your Selection</span>
+            </h3>
+            
+            {selectedPackage && (
+              <div className="mb-4 pb-4 border-b border-white/10">
+                <p className="text-sm text-[#A3A3A3] mb-1">Package</p>
+                <div className="flex justify-between items-center">
+                  <p className="font-semibold text-white">{selectedPackage.name}</p>
+                  <p className="text-[#D32F2F] font-bold">₹{selectedPackage.price.toLocaleString()}</p>
+                </div>
+              </div>
+            )}
+            
+            {selectedAddOns.length > 0 && (
+              <div className="mb-4 pb-4 border-b border-white/10">
+                <p className="text-sm text-[#A3A3A3] mb-2">Add-ons ({selectedAddOns.length})</p>
+                <div className="space-y-2">
+                  {selectedAddOns.map((addon, idx) => (
+                    <div key={idx} className="flex justify-between items-start text-sm">
+                      <p className="text-white flex-1 pr-2">{addon.name}</p>
+                      <p className="text-[#D32F2F] font-semibold">₹{addon.price.toLocaleString()}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            <div className="flex justify-between items-center mb-4">
+              <p className="text-lg font-bold text-white">Total</p>
+              <p className="text-2xl font-bold text-[#D4AF37]">₹{calculateTotal().toLocaleString()}</p>
+            </div>
+            
+            <button
+              onClick={() => setShowContactModal(true)}
+              className="w-full bg-[#D32F2F] text-white hover:bg-[#B71C1C] rounded-sm px-6 py-3 font-medium transition-all duration-300"
+            >
+              Get Quote & Book
+            </button>
+          </motion.div>
+        )}
+
+        {/* Contact Modal */}
+        <AnimatePresence>
+          {showContactModal && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4"
+              onClick={() => setShowContactModal(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.8 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0.8 }}
+                className="bg-[#121212] border border-[#D4AF37] rounded-sm p-8 max-w-2xl w-full"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex justify-between items-start mb-6">
+                  <h2 className="font-heading text-3xl font-bold">
+                    Contact <span className="text-[#D4AF37]">Chitrakatha</span>
+                  </h2>
+                  <button
+                    onClick={() => setShowContactModal(false)}
+                    className="text-white hover:text-[#D32F2F] transition-colors"
+                  >
+                    <X size={28} />
+                  </button>
+                </div>
+
+                {selectedPackage && (
+                  <div className="bg-[#1A1A1A] border border-white/10 rounded-sm p-4 mb-6">
+                    <p className="text-sm text-[#A3A3A3] mb-2">Selected Package</p>
+                    <div className="flex justify-between items-center">
+                      <p className="font-semibold text-xl text-white">{selectedPackage.name}</p>
+                      <p className="text-2xl font-bold text-[#D32F2F]">₹{selectedPackage.price.toLocaleString()}</p>
+                    </div>
+                    {selectedAddOns.length > 0 && (
+                      <p className="text-xs text-[#D4AF37] mt-2">+ {selectedAddOns.length} Add-on service(s)</p>
+                    )}
+                  </div>
+                )}
+
+                <div className="space-y-4 mb-6">
+                  <a 
+                    href="tel:+919800000000"
+                    className="flex items-center space-x-4 bg-[#1A1A1A] border border-white/10 hover:border-[#D32F2F] rounded-sm p-4 transition-all duration-300 group"
+                  >
+                    <div className="bg-[#D32F2F] p-3 rounded-sm group-hover:bg-[#B71C1C] transition-colors">
+                      <Phone size={24} className="text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-[#A3A3A3]">Call Us</p>
+                      <p className="text-lg font-semibold text-white">+91 98000 00000</p>
+                    </div>
+                  </a>
+
+                  <a 
+                    href="https://wa.me/919800000000?text=Hi%2C%20I%20want%20to%20book%20a%20photography%20package"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center space-x-4 bg-[#1A1A1A] border border-white/10 hover:border-[#25D366] rounded-sm p-4 transition-all duration-300 group"
+                  >
+                    <div className="bg-[#25D366] p-3 rounded-sm group-hover:bg-[#1FA855] transition-colors">
+                      <MessageCircle size={24} className="text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-[#A3A3A3]">WhatsApp</p>
+                      <p className="text-lg font-semibold text-white">Chat with us</p>
+                    </div>
+                  </a>
+
+                  <a 
+                    href="mailto:contact@chitrakatha.com"
+                    className="flex items-center space-x-4 bg-[#1A1A1A] border border-white/10 hover:border-[#D4AF37] rounded-sm p-4 transition-all duration-300 group"
+                  >
+                    <div className="bg-[#D4AF37] p-3 rounded-sm group-hover:bg-[#C5A028] transition-colors">
+                      <Mail size={24} className="text-black" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-[#A3A3A3]">Email</p>
+                      <p className="text-lg font-semibold text-white">contact@chitrakatha.com</p>
+                    </div>
+                  </a>
+                </div>
+
+                <div className="bg-[#D32F2F]/10 border border-[#D32F2F]/30 rounded-sm p-4 text-center">
+                  <p className="text-sm text-[#E5E5E5]">
+                    Our team will get back to you within 24 hours to discuss your requirements and finalize the booking.
+                  </p>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Terms & Payment - Rest of the code remains same */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
