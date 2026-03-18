@@ -10,6 +10,7 @@ const API = `${BACKEND_URL}/api`;
 const Home = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [featuredImages, setFeaturedImages] = useState([]);
+  const [packageImages, setPackageImages] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Hero slideshow images
@@ -40,6 +41,10 @@ const Home = () => {
       // Get featured images
       const featured = images.filter(img => img.section === 'featured').sort((a, b) => a.order - b.order).slice(0, 3);
       setFeaturedImages(featured);
+      
+      // Get service images for packages
+      const services = images.filter(img => img.section === 'services').sort((a, b) => a.order - b.order).slice(0, 4);
+      setPackageImages(services);
     } catch (error) {
       console.error('Error fetching site images:', error);
     } finally {
@@ -232,19 +237,40 @@ const Home = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: idx * 0.1 }}
                 viewport={{ once: true }}
-                className={`bg-[#121212] p-6 rounded-sm transition-all duration-500 hover:transform hover:scale-105 ${
+                className={`bg-[#121212] rounded-sm overflow-hidden transition-all duration-500 hover:transform hover:scale-105 ${
                   pkg.highlight ? 'border-2 border-[#D4AF37]' : 'border border-white/5 hover:border-[#D4AF37]/30'
                 }`}
                 data-testid={`package-preview-${pkg.name.toLowerCase().replace(' ', '-')}`}
               >
-                <h3 className="font-heading text-2xl font-bold mb-4">{pkg.name}</h3>
-                <p className="text-sm text-[#A3A3A3] mb-6">Perfect for your special day</p>
-                <Link
-                  to="/services"
-                  className="inline-block text-[#D32F2F] hover:text-[#B71C1C] font-medium transition-colors"
-                >
-                  View Details →
-                </Link>
+                {/* Package Image */}
+                {packageImages[idx] && (
+                  <div className="relative h-48 overflow-hidden">
+                    <img
+                      src={packageImages[idx].image_url}
+                      alt={pkg.name}
+                      className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#121212] via-transparent to-transparent" />
+                    {pkg.highlight && (
+                      <div className="absolute top-4 right-4 bg-[#D4AF37] text-black px-3 py-1 text-xs font-bold uppercase tracking-widest">
+                        Popular
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {/* Package Info */}
+                <div className="p-6">
+                  <h3 className="font-heading text-2xl font-bold mb-3">{pkg.name}</h3>
+                  <p className="text-sm text-[#A3A3A3] mb-4">Perfect for your special day</p>
+                  <Link
+                    to="/services"
+                    className="inline-flex items-center space-x-2 text-[#D32F2F] hover:text-[#B71C1C] font-medium transition-colors group"
+                  >
+                    <span>View Details</span>
+                    <ArrowRight className="group-hover:translate-x-1 transition-transform" size={18} />
+                  </Link>
+                </div>
               </motion.div>
             ))}
           </div>
