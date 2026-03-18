@@ -221,10 +221,10 @@ const Home = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { name: 'Traditional', price: '₹70,000' },
-              { name: 'Semi-Cinematic', price: '₹80,000' },
-              { name: 'Cinematic', price: '₹90,000' },
-              { name: 'Premium', price: '₹1,20,000', highlight: true }
+              { name: 'Traditional', highlight: false },
+              { name: 'Semi-Cinematic', highlight: false },
+              { name: 'Cinematic', highlight: false },
+              { name: 'Premium', highlight: true }
             ].map((pkg, idx) => (
               <motion.div
                 key={idx}
@@ -237,9 +237,14 @@ const Home = () => {
                 }`}
                 data-testid={`package-preview-${pkg.name.toLowerCase().replace(' ', '-')}`}
               >
-                <h3 className="font-heading text-2xl font-bold mb-2">{pkg.name}</h3>
-                <p className="text-3xl font-bold text-[#D32F2F] mb-4">{pkg.price}</p>
-                <p className="text-sm text-[#A3A3A3] mb-4">Starting from</p>
+                <h3 className="font-heading text-2xl font-bold mb-4">{pkg.name}</h3>
+                <p className="text-sm text-[#A3A3A3] mb-6">Perfect for your special day</p>
+                <Link
+                  to="/services"
+                  className="inline-block text-[#D32F2F] hover:text-[#B71C1C] font-medium transition-colors"
+                >
+                  View Details →
+                </Link>
               </motion.div>
             ))}
           </div>
