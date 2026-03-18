@@ -41,7 +41,7 @@ const Gallery = () => {
     ? galleryItems 
     : galleryItems.filter(item => item.category.toLowerCase() === filter);
 
-  const categories = ['all', 'wedding', 'pre-wedding', 'portrait', 'event'];
+  const categories = ['all', 'wedding', 'pre-wedding', 'portrait', 'kids'];
 
   return (
     <div className="min-h-screen pt-32 pb-20 px-4 md:px-8">

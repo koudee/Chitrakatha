@@ -329,7 +329,7 @@ const AdminDashboard = ({ onLogout }) => {
                           <option>Wedding</option>
                           <option>Pre-Wedding</option>
                           <option>Portrait</option>
-                          <option>Event</option>
+                          <option>Kids</option>
                         </select>
                       </div>
                     </div>

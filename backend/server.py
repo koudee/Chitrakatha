@@ -99,7 +99,7 @@ class GalleryItem(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     title: str
-    category: str  # Wedding, Pre-Wedding, Portrait, Event
+    category: str  # Wedding, Pre-Wedding, Portrait, Kids
     media_type: str  # photo, video
     media_url: str
     thumbnail_url: Optional[str] = None
