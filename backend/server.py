@@ -643,6 +643,28 @@ async def startup_event():
                 media_type="photo",
                 media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/zf1vnqdd_WhatsApp%20Image%202026-02-20%20at%2012.04.57%20AM.jpeg",
                 order=9
+            ),
+            # Hero slideshow images added to gallery
+            GalleryItem(
+                title="Radiant Bride in Red",
+                category="Wedding",
+                media_type="photo",
+                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/c7tws8fd_DRP_0150.jpg.jpeg",
+                order=10
+            ),
+            GalleryItem(
+                title="Bridal Elegance",
+                category="Portrait",
+                media_type="photo",
+                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/1jyxdn7l_DRP_0213.jpg.jpeg",
+                order=11
+            ),
+            GalleryItem(
+                title="Traditional Bengali Bride",
+                category="Wedding",
+                media_type="photo",
+                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/dzf4ww5n_DRP_0484.jpg.jpeg",
+                order=12
             )
         ]
         

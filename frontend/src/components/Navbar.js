@@ -58,9 +58,9 @@ const Navbar = ({ isAuthenticated, onLogout }) => {
             <motion.img 
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.2 }}
-              src="https://customer-assets.emergentagent.com/job_084c5691-4eb2-4ffe-b321-0ad44c35e91c/artifacts/tkvjrxz5_WhatsApp%20Image%202026-02-18%20at%202.55.27%20PM.jpeg"
+              src="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/4h5cyr6c_chitrakotha.png"
               alt="Chitrakatha Logo"
-              className="h-14 w-auto object-contain"
+              className="h-16 w-auto object-contain"
             />
           </Link>
 

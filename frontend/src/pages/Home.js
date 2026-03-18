@@ -23,11 +23,11 @@ const Home = () => {
     fetchSiteImages();
   }, []);
 
-  // Auto-advance slideshow
+  // Auto-advance slideshow every 8 seconds (slower for better viewing)
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-    }, 5000); // Change slide every 5 seconds
+    }, 8000); // Changed from 5000ms to 8000ms (8 seconds)
 
     return () => clearInterval(interval);
   }, [heroSlides.length]);
