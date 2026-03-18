@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Check, Plus } from 'lucide-react';
+import { Check, Plus, Tag } from 'lucide-react';
 import { toast } from 'sonner';
 import axios from 'axios';
 
@@ -28,11 +28,13 @@ const Services = () => {
   const packages = [
     {
       name: 'Traditional',
-      price: 70000,
+      originalPrice: 95000,
+      price: 80000,
+      discount: 16,
       duration: '3 Days Coverage',
       features: [
         '2 x 20 Sheets NT Glossy Album with bag (18" X 12")',
-        '120 Edited Photos per album',
+        '120 Edited Photos for each album',
         'All Raw Photos',
         '2 x Full HD Traditional Video (1920x1080)',
         '2 Pendrives',
@@ -42,24 +44,30 @@ const Services = () => {
     },
     {
       name: 'Semi-Cinematic',
-      price: 80000,
-      duration: '4 Days Coverage',
+      originalPrice: 105000,
+      price: 90000,
+      discount: 14,
+      duration: '3 Days Coverage',
       features: [
+        '1 Invitation (Photo)',
         '2 x 25 Sheets NT Glossy Album with Leather bag (18" X 12")',
-        '150 Edited Photos per album',
+        '150 Edited Photos for each album',
         'All Raw Photos',
         '2 x Full HD Semi Cinematic Video (1920x1080)',
         '1 Teaser video',
         '2 Pendrives',
         '1 Photographer & 1 Videographer (each side)',
-        '4 Days Coverage'
+        '3 Days Coverage'
       ]
     },
     {
       name: 'Cinematic',
-      price: 90000,
-      duration: '4 Days Coverage',
+      originalPrice: 115000,
+      price: 100000,
+      discount: 13,
+      duration: '3 Days Coverage',
       features: [
+        '1 Invitation Video',
         '2 x 25 Sheets Exclusive Album (18" X 12")',
         '150 High End Edited Photos each side',
         'Leather Bag',
@@ -68,17 +76,20 @@ const Services = () => {
         '1 Full HD Cinematic video (1920x1080)',
         'Cinematic Wedding Trailer',
         '3 Reels',
-        '2 Pendrive 8 box',
-        '1 Photographer, 1 Cinematographer & 1 Candid Photographer',
-        '4 Days Coverage'
+        '2 Pendrive & box',
+        '1 Photographer, 1 Cinematographer & 1 Candid Photographer (on the wedding & reception day)',
+        '3 Days Coverage'
       ]
     },
     {
       name: 'Premium Cinematic',
-      price: 120000,
+      originalPrice: 145000,
+      price: 130000,
+      discount: 10,
       duration: '4 Days Coverage',
       highlight: true,
       features: [
+        '1 AI Invitation Video',
         '30 Sheets Exclusive Album (18" X 12")',
         '200 High End Edited photos for each album',
         'Mini Replica Book',
@@ -87,7 +98,7 @@ const Services = () => {
         'Raw Copies With Color Adjustment Editing',
         '1 Full HD Edited Cinematic Full Video (1920x1080)',
         '1 Cinematic Wedding Trailer',
-        '2 best Photographers & 1 best Cinematographer (each side)',
+        '2 best Photographers & 1 best Cinematographers (each side)',
         '1 Pendrive & Box',
         'Drone on Wedding Day & Reception Day',
         '4 Days Coverage'
@@ -125,6 +136,10 @@ const Services = () => {
           <p className="text-lg text-[#A3A3A3] max-w-3xl mx-auto">
             Choose the perfect package for your special day. Each package includes both bride and groom side coverage.
           </p>
+          <div className="mt-4 inline-flex items-center space-x-2 bg-[#D32F2F]/10 border border-[#D32F2F]/30 rounded-sm px-6 py-3">
+            <Tag className="text-[#D32F2F]" size={20} />
+            <span className="text-[#D32F2F] font-semibold">Limited Time Offer - Save up to 16%!</span>
+          </div>
         </motion.div>
 
         {/* Main Packages */}
@@ -152,18 +167,27 @@ const Services = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-[#121212] to-transparent" />
                 {pkg.highlight && (
                   <div className="absolute top-4 right-4 bg-[#D4AF37] text-black px-4 py-1 text-xs font-bold uppercase tracking-widest">
-                    Popular
+                    Most Popular
                   </div>
                 )}
+                {/* Discount Badge */}
+                <div className="absolute top-4 left-4 bg-[#D32F2F] text-white px-3 py-1 rounded-sm text-xs font-bold">
+                  {pkg.discount}% OFF
+                </div>
               </div>
 
               {/* Package Content */}
               <div className="p-6">
                 <h3 className="font-heading text-2xl font-bold mb-2" data-testid={`package-name-${idx}`}>{pkg.name}</h3>
                 <p className="text-sm text-[#A3A3A3] mb-4">{pkg.duration}</p>
-                <div className="flex items-baseline mb-6">
-                  <span className="text-4xl font-bold text-[#D32F2F]">₹{(pkg.price / 1000).toFixed(0)}k</span>
-                  <span className="text-sm text-[#A3A3A3] ml-2">Both Sides</span>
+                
+                {/* Pricing with strikethrough */}
+                <div className="mb-4">
+                  <div className="flex items-center space-x-3 mb-1">
+                    <span className="text-lg text-[#A3A3A3] line-through">₹{(pkg.originalPrice / 1000).toFixed(0)}k</span>
+                    <span className="text-3xl font-bold text-[#D32F2F]">₹{(pkg.price / 1000).toFixed(0)}k</span>
+                  </div>
+                  <p className="text-xs text-[#D4AF37]">Save ₹{((pkg.originalPrice - pkg.price) / 1000).toFixed(0)}k • Both Sides</p>
                 </div>
 
                 {/* Features */}
@@ -234,32 +258,87 @@ const Services = () => {
           className="bg-[#121212] border border-white/5 p-8 rounded-sm"
         >
           <h2 className="font-heading text-2xl font-bold mb-6" data-testid="terms-title">
-            Payment Terms & <span className="text-[#D4AF37]">General Details</span>
+            Payment Terms & <span className="text-[#D4AF37]">Delivery Timeline</span>
           </h2>
-          <div className="grid md:grid-cols-2 gap-6 text-sm text-[#A3A3A3]">
+          
+          <div className="grid md:grid-cols-2 gap-8 text-sm text-[#A3A3A3] mb-8">
             <div>
-              <h3 className="text-white font-semibold mb-3">Payment Schedule:</h3>
+              <h3 className="text-white font-semibold mb-4 text-lg">Payment Schedule:</h3>
               <ul className="space-y-2">
-                <li>• 15% due upon booking</li>
-                <li>• 35% before the wedding day</li>
-                <li>• 40% after the event</li>
-                <li>• 10% on album delivery</li>
+                <li className="flex items-start">
+                  <Check size={16} className="text-[#D4AF37] mr-2 flex-shrink-0 mt-0.5" />
+                  <span><strong className="text-white">15%</strong> due upon booking</span>
+                </li>
+                <li className="flex items-start">
+                  <Check size={16} className="text-[#D4AF37] mr-2 flex-shrink-0 mt-0.5" />
+                  <span><strong className="text-white">35%</strong> before the wedding day</span>
+                </li>
+                <li className="flex items-start">
+                  <Check size={16} className="text-[#D4AF37] mr-2 flex-shrink-0 mt-0.5" />
+                  <span><strong className="text-white">40%</strong> after the event</span>
+                </li>
+                <li className="flex items-start">
+                  <Check size={16} className="text-[#D4AF37] mr-2 flex-shrink-0 mt-0.5" />
+                  <span>Remaining <strong className="text-white">10%</strong> on album delivery</span>
+                </li>
               </ul>
             </div>
+            
             <div>
-              <h3 className="text-white font-semibold mb-3">Delivery Timeline:</h3>
+              <h3 className="text-white font-semibold mb-4 text-lg">Delivery Timeline:</h3>
               <ul className="space-y-2">
-                <li>• Unedited photos: 7-10 days (online drive)</li>
-                <li>• Photo selection: Within 30 days</li>
-                <li>• Album delivery: 25-30 days after design approval</li>
-                <li>• Minor video changes: Once at no additional cost</li>
+                <li className="flex items-start">
+                  <Check size={16} className="text-[#D4AF37] mr-2 flex-shrink-0 mt-0.5" />
+                  <span><strong className="text-white">Album:</strong> Maximum 50 days after selection</span>
+                </li>
+                <li className="flex items-start">
+                  <Check size={16} className="text-[#D4AF37] mr-2 flex-shrink-0 mt-0.5" />
+                  <span><strong className="text-white">Video:</strong> At least 90 days preparation time</span>
+                </li>
+                <li className="flex items-start">
+                  <Check size={16} className="text-[#D4AF37] mr-2 flex-shrink-0 mt-0.5" />
+                  <span><strong className="text-white">Collection:</strong> Within 15 days of completion</span>
+                </li>
+                <li className="flex items-start">
+                  <Check size={16} className="text-[#D4AF37] mr-2 flex-shrink-0 mt-0.5" />
+                  <span><strong className="text-white">Photo Selection:</strong> Must be completed within 7 days of receiving raw data</span>
+                </li>
               </ul>
             </div>
           </div>
-          <div className="mt-6 pt-6 border-t border-white/5">
-            <p className="text-sm text-[#A3A3A3]">
-              <span className="text-white font-semibold">Note:</span> Client is responsible for crew expenses (food, lodging, travel). Video music must be provided by the client.
-            </p>
+
+          <div className="border-t border-white/10 pt-6">
+            <h3 className="text-white font-semibold mb-4 text-lg">Terms & Conditions:</h3>
+            <ul className="space-y-3 text-sm text-[#A3A3A3]">
+              <li className="flex items-start">
+                <span className="text-[#D32F2F] mr-2 flex-shrink-0">•</span>
+                <span>All raw photos will be provided on a pendrive after the event. Client must select preferred ones within 7 days.</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-[#D32F2F] mr-2 flex-shrink-0">•</span>
+                <span>Client is responsible for covering expenses related to food, lodging, and travel for crew members.</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-[#D32F2F] mr-2 flex-shrink-0">•</span>
+                <span>Music used in the video must be provided by the client.</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-[#D32F2F] mr-2 flex-shrink-0">•</span>
+                <span>Clients and their family must cooperate with photographers for better results.</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-[#D32F2F] mr-2 flex-shrink-0">•</span>
+                <span>Minor changes in the video can be done once at no additional cost. Further changes will be subject to additional charges.</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-[#D32F2F] mr-2 flex-shrink-0">•</span>
+                <span className="text-[#D4AF37]">Photographers will not be liable for dissatisfying output if clients/family do not cooperate.</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-[#D32F2F] mr-2 flex-shrink-0">•</span>
+                <span className="text-[#D4AF37]">The photographer shall not be held responsible for any data loss after six (6) months.</span>
+              </li>
+            </ul>
           </div>
         </motion.div>
       </div>
