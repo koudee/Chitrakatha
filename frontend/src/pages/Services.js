@@ -107,13 +107,48 @@ const Services = () => {
   ];
 
   const addOns = [
-    { name: 'Pre/Post Wedding Photography', price: 8000, description: '1-day shoot in Asansol' },
-    { name: 'Pre/Post Wedding Cinematic Video', price: 10000, description: '1-day shoot in Asansol (excluding drone)' },
-    { name: 'Additional 2-day Pre-Wedding Shoot', price: 10000, description: 'Extended pre-wedding coverage' },
-    { name: 'Aiburo Bhat + Mehendi Photography', price: 6000, description: 'Per event (separate charges for bride & groom sides)' },
-    { name: 'Dodhi Mongal Photography', price: 3000, description: 'Early morning event (separate charges for bride & groom sides)' },
-    { name: 'Drone Usage', price: 5000, description: 'Single day coverage in Asansol' },
-    { name: 'Additional Candid Photographer', price: 4000, description: 'Single day in Asansol' }
+    { 
+      name: 'Pre/Post Wedding Photography with Selected Edits', 
+      originalPrice: 12000,
+      price: 10000, 
+      description: '1-day shoot in Asansol' 
+    },
+    { 
+      name: 'Pre/Post Wedding Cinematography with Edit', 
+      originalPrice: 12000,
+      price: 10000, 
+      description: '1-day shoot in Asansol (excluding drone)' 
+    },
+    { 
+      name: 'Additional 1 Day Prewedding Shoot', 
+      originalPrice: 12000,
+      price: 10000, 
+      description: 'Extended pre-wedding coverage' 
+    },
+    { 
+      name: 'Aiburo Bhat + Mehendi Photography + Videography', 
+      originalPrice: 12000,
+      price: 10000, 
+      description: 'Complete coverage (separate charges for bride & groom sides)' 
+    },
+    { 
+      name: 'Dodhi Mangal Photography', 
+      originalPrice: 6000,
+      price: 4000, 
+      description: 'Early morning event (separate charges for bride & groom sides)' 
+    },
+    { 
+      name: 'Drone Usage', 
+      originalPrice: 8000,
+      price: 6000, 
+      description: 'Per day coverage - Local' 
+    },
+    { 
+      name: 'Additional Candid Photographer', 
+      originalPrice: 7000,
+      price: 5000, 
+      description: 'Per day - Local' 
+    }
   ];
 
   const handleBookPackage = (pkg) => {
@@ -243,7 +278,13 @@ const Services = () => {
                   <Plus size={20} className="text-[#D4AF37] flex-shrink-0 ml-2" />
                 </div>
                 <p className="text-sm text-[#A3A3A3] mb-4">{addon.description}</p>
-                <p className="text-2xl font-bold text-[#D32F2F]">₹{addon.price.toLocaleString()}</p>
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-[#A3A3A3] line-through">₹{addon.originalPrice.toLocaleString()}</span>
+                  <span className="text-2xl font-bold text-[#D32F2F]">₹{addon.price.toLocaleString()}</span>
+                </div>
+                {addon.originalPrice > addon.price && (
+                  <p className="text-xs text-[#D4AF37] mt-1">Save ₹{(addon.originalPrice - addon.price).toLocaleString()}</p>
+                )}
               </motion.div>
             ))}
           </div>
