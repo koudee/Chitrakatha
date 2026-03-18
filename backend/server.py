@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Depends, status
+from fastapi import FastAPI, APIRouter, HTTPException, Depends, status, UploadFile, File
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
@@ -12,6 +12,7 @@ import uuid
 from datetime import datetime, timezone, timedelta
 import bcrypt
 import jwt
+import base64
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -102,6 +103,7 @@ class GalleryItem(BaseModel):
     media_type: str  # photo, video
     media_url: str
     thumbnail_url: Optional[str] = None
+    order: int = 0
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 class DashboardOverview(BaseModel):
@@ -124,6 +126,13 @@ class SiteImageCreate(BaseModel):
     image_url: str
     alt_text: Optional[str] = None
     order: int = 0
+
+class ImageUploadResponse(BaseModel):
+    image_url: str
+    message: str
+
+class ReorderRequest(BaseModel):
+    items: List[dict]  # List of {id: str, order: int}
 
 # ============ AUTH UTILITIES ============
 
@@ -305,6 +314,55 @@ async def admin_update_site_images_bulk(images: List[SiteImageCreate], user_id: 
         created_images.append(img_obj)
     
     return {"message": f"Updated {len(created_images)} site images", "images": created_images}
+
+@api_router.post("/admin/upload-image", response_model=ImageUploadResponse)
+async def admin_upload_image(file: UploadFile = File(...), user_id: str = Depends(get_admin_user)):
+    """Upload image and return base64 data URL"""
+    try:
+        # Read file content
+        contents = await file.read()
+        
+        # Convert to base64
+        base64_encoded = base64.b64encode(contents).decode('utf-8')
+        
+        # Determine mime type
+        mime_type = file.content_type or 'image/jpeg'
+        
+        # Create data URL
+        data_url = f"data:{mime_type};base64,{base64_encoded}"
+        
+        return ImageUploadResponse(
+            image_url=data_url,
+            message="Image uploaded successfully"
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to upload image: {str(e)}")
+
+@api_router.put("/admin/gallery/reorder")
+async def admin_reorder_gallery(request: ReorderRequest, user_id: str = Depends(get_admin_user)):
+    """Reorder gallery items"""
+    try:
+        for item in request.items:
+            await db.gallery.update_one(
+                {"id": item["id"]},
+                {"$set": {"order": item["order"]}}
+            )
+        return {"message": "Gallery reordered successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to reorder: {str(e)}")
+
+@api_router.put("/admin/site-images/reorder")
+async def admin_reorder_site_images(request: ReorderRequest, user_id: str = Depends(get_admin_user)):
+    """Reorder site images"""
+    try:
+        for item in request.items:
+            await db.site_images.update_one(
+                {"id": item["id"]},
+                {"$set": {"order": item["order"]}}
+            )
+        return {"message": "Site images reordered successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to reorder: {str(e)}")
 
 @api_router.get("/site-images")
 async def get_site_images():
@@ -519,62 +577,72 @@ async def startup_event():
                 title="Beautiful Bride Portrait",
                 category="Wedding",
                 media_type="photo",
-                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/nd8u6n4a_WhatsApp%20Image%202026-02-18%20at%206.22.32%20PM.jpeg"
+                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/nd8u6n4a_WhatsApp%20Image%202026-02-18%20at%206.22.32%20PM.jpeg",
+                order=0
             ),
             GalleryItem(
                 title="Romantic Pre-Wedding Shoot",
                 category="Pre-Wedding",
                 media_type="photo",
-                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/2y1wmxgm_WhatsApp%20Image%202026-02-20%20at%2012.04.55%20AM%20%282%29.jpeg"
+                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/2y1wmxgm_WhatsApp%20Image%202026-02-20%20at%2012.04.55%20AM%20%282%29.jpeg",
+                order=1
             ),
             GalleryItem(
                 title="Couple Portrait Session",
                 category="Pre-Wedding",
                 media_type="photo",
-                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/rev1u9a6_WhatsApp%20Image%202026-02-20%20at%2012.04.55%20AM.jpeg"
+                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/rev1u9a6_WhatsApp%20Image%202026-02-20%20at%2012.04.55%20AM.jpeg",
+                order=2
             ),
             GalleryItem(
                 title="Haldi Ceremony Celebration",
                 category="Wedding",
                 media_type="photo",
-                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/iuyyqp11_WhatsApp%20Image%202026-02-20%20at%2012.04.56%20AM%20%281%29.jpeg"
+                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/iuyyqp11_WhatsApp%20Image%202026-02-20%20at%2012.04.56%20AM%20%281%29.jpeg",
+                order=3
             ),
             GalleryItem(
                 title="Wedding Day Group Photo",
                 category="Wedding",
                 media_type="photo",
-                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/7kr5tkeu_WhatsApp%20Image%202026-02-20%20at%2012.04.56%20AM.jpeg"
+                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/7kr5tkeu_WhatsApp%20Image%202026-02-20%20at%2012.04.56%20AM.jpeg",
+                order=4
             ),
             # New set of images
             GalleryItem(
                 title="Elegant Bridal Portrait",
                 category="Wedding",
                 media_type="photo",
-                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/3c6lzonb_WhatsApp%20Image%202026-02-18%20at%206.22.33%20PM%20%281%29.jpeg"
+                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/3c6lzonb_WhatsApp%20Image%202026-02-18%20at%206.22.33%20PM%20%281%29.jpeg",
+                order=5
             ),
             GalleryItem(
                 title="Artistic Bride Close-up",
                 category="Portrait",
                 media_type="photo",
-                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/7jad38aw_WhatsApp%20Image%202026-02-18%20at%206.22.33%20PM.jpeg"
+                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/7jad38aw_WhatsApp%20Image%202026-02-18%20at%206.22.33%20PM.jpeg",
+                order=6
             ),
             GalleryItem(
                 title="Pre-Wedding Couple in Black",
                 category="Pre-Wedding",
                 media_type="photo",
-                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/520ttye7_WhatsApp%20Image%202026-02-20%20at%2012.04.55%20AM%20%281%29.jpeg"
+                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/520ttye7_WhatsApp%20Image%202026-02-20%20at%2012.04.55%20AM%20%281%29.jpeg",
+                order=7
             ),
             GalleryItem(
                 title="Romantic Archway Moment",
                 category="Pre-Wedding",
                 media_type="photo",
-                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/u1naa4w7_WhatsApp%20Image%202026-02-20%20at%2012.04.55%20AM%20%282%29.jpeg"
+                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/u1naa4w7_WhatsApp%20Image%202026-02-20%20at%2012.04.55%20AM%20%282%29.jpeg",
+                order=8
             ),
             GalleryItem(
                 title="Joyful Wedding Celebration",
                 category="Wedding",
                 media_type="photo",
-                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/zf1vnqdd_WhatsApp%20Image%202026-02-20%20at%2012.04.57%20AM.jpeg"
+                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/zf1vnqdd_WhatsApp%20Image%202026-02-20%20at%2012.04.57%20AM.jpeg",
+                order=9
             )
         ]
         

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { 
@@ -10,7 +11,10 @@ import {
   Upload,
   Home,
   Briefcase,
-  Info
+  Info,
+  X,
+  GripVertical,
+  Eye
 } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -21,6 +25,9 @@ const AdminDashboard = ({ onLogout }) => {
   const [galleryItems, setGalleryItems] = useState([]);
   const [siteImages, setSiteImages] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [previewImage, setPreviewImage] = useState(null);
+  const [uploadingFile, setUploadingFile] = useState(false);
+  
   const [newImage, setNewImage] = useState({
     title: '',
     category: 'Wedding',
@@ -47,13 +54,46 @@ const AdminDashboard = ({ onLogout }) => {
         axios.get(`${API}/admin/site-images`, { headers })
       ]);
 
-      setGalleryItems(galleryRes.data);
-      setSiteImages(siteImagesRes.data);
+      setGalleryItems(galleryRes.data.sort((a, b) => (a.order || 0) - (b.order || 0)));
+      setSiteImages(siteImagesRes.data.sort((a, b) => (a.order || 0) - (b.order || 0)));
     } catch (error) {
       console.error('Error fetching admin data:', error);
       toast.error('Failed to load data');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleFileUpload = async (file, isGallery = true) => {
+    setUploadingFile(true);
+    const token = localStorage.getItem('adminToken');
+    const headers = { Authorization: `Bearer ${token}` };
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await axios.post(`${API}/admin/upload-image`, formData, {
+        headers: {
+          ...headers,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      const imageUrl = response.data.image_url;
+      
+      if (isGallery) {
+        setNewImage({ ...newImage, media_url: imageUrl });
+      } else {
+        setNewSiteImage({ ...newSiteImage, image_url: imageUrl });
+      }
+      
+      toast.success('Image uploaded successfully');
+    } catch (error) {
+      toast.error('Failed to upload image');
+      console.error(error);
+    } finally {
+      setUploadingFile(false);
     }
   };
 
@@ -63,7 +103,10 @@ const AdminDashboard = ({ onLogout }) => {
     const headers = { Authorization: `Bearer ${token}` };
 
     try {
-      await axios.post(`${API}/admin/gallery`, newImage, { headers });
+      await axios.post(`${API}/admin/gallery`, {
+        ...newImage,
+        order: galleryItems.length
+      }, { headers });
       toast.success('Gallery image added successfully');
       setNewImage({ title: '', category: 'Wedding', media_url: '', media_type: 'photo' });
       fetchData();
@@ -87,13 +130,45 @@ const AdminDashboard = ({ onLogout }) => {
     }
   };
 
+  const handleGalleryDragEnd = async (result) => {
+    if (!result.destination) return;
+
+    const items = Array.from(galleryItems);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+
+    const updatedItems = items.map((item, index) => ({
+      ...item,
+      order: index
+    }));
+
+    setGalleryItems(updatedItems);
+
+    const token = localStorage.getItem('adminToken');
+    const headers = { Authorization: `Bearer ${token}` };
+
+    try {
+      await axios.put(`${API}/admin/gallery/reorder`, {
+        items: updatedItems.map(item => ({ id: item.id, order: item.order }))
+      }, { headers });
+      toast.success('Gallery reordered');
+    } catch (error) {
+      toast.error('Failed to save order');
+      fetchData();
+    }
+  };
+
   const handleAddSiteImage = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('adminToken');
     const headers = { Authorization: `Bearer ${token}` };
 
     try {
-      await axios.post(`${API}/admin/site-images`, newSiteImage, { headers });
+      const sectionImages = siteImages.filter(img => img.section === newSiteImage.section);
+      await axios.post(`${API}/admin/site-images`, {
+        ...newSiteImage,
+        order: sectionImages.length
+      }, { headers });
       toast.success('Site image added successfully');
       setNewSiteImage({ section: 'hero', image_url: '', alt_text: '' });
       fetchData();
@@ -117,6 +192,40 @@ const AdminDashboard = ({ onLogout }) => {
     }
   };
 
+  const handleSiteImagesDragEnd = async (result, section) => {
+    if (!result.destination) return;
+
+    const sectionImages = siteImages.filter(img => img.section === section);
+    const items = Array.from(sectionImages);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+
+    const updatedItems = items.map((item, index) => ({
+      ...item,
+      order: index
+    }));
+
+    const newSiteImages = [
+      ...siteImages.filter(img => img.section !== section),
+      ...updatedItems
+    ].sort((a, b) => (a.order || 0) - (b.order || 0));
+
+    setSiteImages(newSiteImages);
+
+    const token = localStorage.getItem('adminToken');
+    const headers = { Authorization: `Bearer ${token}` };
+
+    try {
+      await axios.put(`${API}/admin/site-images/reorder`, {
+        items: updatedItems.map(item => ({ id: item.id, order: item.order }))
+      }, { headers });
+      toast.success('Images reordered');
+    } catch (error) {
+      toast.error('Failed to save order');
+      fetchData();
+    }
+  };
+
   const tabs = [
     { id: 'gallery', label: 'Gallery Management', icon: ImageIcon },
     { id: 'site-images', label: 'Site Images', icon: Home }
@@ -134,7 +243,6 @@ const AdminDashboard = ({ onLogout }) => {
   return (
     <div className="min-h-screen pt-24 pb-20 px-4 md:px-8">
       <div className="container mx-auto">
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -148,7 +256,7 @@ const AdminDashboard = ({ onLogout }) => {
                 Admin <span className="text-[#D32F2F]">Dashboard</span>
               </h1>
             </div>
-            <p className="text-[#A3A3A3]">Manage gallery and site images</p>
+            <p className="text-[#A3A3A3]">Manage gallery and site images with drag & drop, file upload, and preview</p>
           </div>
           <button
             onClick={onLogout}
@@ -159,7 +267,6 @@ const AdminDashboard = ({ onLogout }) => {
           </button>
         </motion.div>
 
-        {/* Tabs */}
         <div className="flex flex-wrap gap-2 mb-8 border-b border-white/10 pb-4">
           {tabs.map((tab) => {
             const Icon = tab.icon;
@@ -187,212 +294,215 @@ const AdminDashboard = ({ onLogout }) => {
           </div>
         ) : (
           <div>
-            {/* Gallery Management Tab */}
             {activeTab === 'gallery' && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5 }}
               >
-                {/* Add New Image Form */}
                 <div className="bg-[#121212] border border-white/10 p-6 rounded-sm mb-8">
                   <h2 className="font-heading text-2xl font-bold mb-4 flex items-center space-x-2">
                     <Plus size={24} className="text-[#D32F2F]" />
                     <span>Add New Gallery Image</span>
                   </h2>
-                  <form onSubmit={handleAddGalleryImage} className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-[#E5E5E5] mb-2">Title</label>
-                      <input
-                        type="text"
-                        value={newImage.title}
-                        onChange={(e) => setNewImage({...newImage, title: e.target.value})}
-                        className="w-full bg-[#1A1A1A] border border-white/10 text-white px-4 py-2 rounded-sm"
-                        required
-                        data-testid="gallery-title-input"
-                      />
+                  <form onSubmit={handleAddGalleryImage} className="space-y-4">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-[#E5E5E5] mb-2">Title</label>
+                        <input
+                          type="text"
+                          value={newImage.title}
+                          onChange={(e) => setNewImage({...newImage, title: e.target.value})}
+                          className="w-full bg-[#1A1A1A] border border-white/10 text-white px-4 py-2 rounded-sm"
+                          required
+                          data-testid="gallery-title-input"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-[#E5E5E5] mb-2">Category</label>
+                        <select
+                          value={newImage.category}
+                          onChange={(e) => setNewImage({...newImage, category: e.target.value})}
+                          className="w-full bg-[#1A1A1A] border border-white/10 text-white px-4 py-2 rounded-sm"
+                          data-testid="gallery-category-select"
+                        >
+                          <option>Wedding</option>
+                          <option>Pre-Wedding</option>
+                          <option>Portrait</option>
+                          <option>Event</option>
+                        </select>
+                      </div>
                     </div>
+                    
                     <div>
-                      <label className="block text-sm font-medium text-[#E5E5E5] mb-2">Category</label>
-                      <select
-                        value={newImage.category}
-                        onChange={(e) => setNewImage({...newImage, category: e.target.value})}
-                        className="w-full bg-[#1A1A1A] border border-white/10 text-white px-4 py-2 rounded-sm"
-                        data-testid="gallery-category-select"
-                      >
-                        <option>Wedding</option>
-                        <option>Pre-Wedding</option>
-                        <option>Portrait</option>
-                        <option>Event</option>
-                      </select>
+                      <label className="block text-sm font-medium text-[#E5E5E5] mb-2">
+                        Upload Image File
+                      </label>
+                      <div className="flex items-center space-x-4">
+                        <label className="flex-1">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                              if (e.target.files[0]) {
+                                handleFileUpload(e.target.files[0], true);
+                              }
+                            }}
+                            className="hidden"
+                          />
+                          <div className="w-full bg-[#1A1A1A] border border-white/10 text-white px-4 py-2 rounded-sm cursor-pointer hover:bg-[#2A2A2A] transition-colors flex items-center justify-center space-x-2">
+                            <Upload size={18} />
+                            <span>{uploadingFile ? 'Uploading...' : 'Choose Image'}</span>
+                          </div>
+                        </label>
+                        {newImage.media_url && (
+                          <button
+                            type="button"
+                            onClick={() => setPreviewImage(newImage.media_url)}
+                            className="bg-[#D4AF37] text-black hover:bg-[#C5A028] rounded-sm px-4 py-2 transition-colors flex items-center space-x-2"
+                          >
+                            <Eye size={18} />
+                            <span>Preview</span>
+                          </button>
+                        )}
+                      </div>
                     </div>
-                    <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-[#E5E5E5] mb-2">Image URL</label>
+
+                    <div>
+                      <label className="block text-sm font-medium text-[#E5E5E5] mb-2">Or Enter Image URL</label>
                       <input
                         type="url"
                         value={newImage.media_url}
                         onChange={(e) => setNewImage({...newImage, media_url: e.target.value})}
                         className="w-full bg-[#1A1A1A] border border-white/10 text-white px-4 py-2 rounded-sm"
                         placeholder="https://..."
-                        required
                         data-testid="gallery-url-input"
                       />
                     </div>
-                    <div className="md:col-span-2">
-                      <button
-                        type="submit"
-                        data-testid="add-gallery-image-button"
-                        className="bg-[#D32F2F] text-white hover:bg-[#B71C1C] rounded-sm px-6 py-2 font-medium transition-all duration-300 flex items-center space-x-2"
-                      >
-                        <Upload size={18} />
-                        <span>Add Image</span>
-                      </button>
-                    </div>
+                    
+                    <button
+                      type="submit"
+                      disabled={!newImage.media_url || uploadingFile}
+                      data-testid="add-gallery-image-button"
+                      className="bg-[#D32F2F] text-white hover:bg-[#B71C1C] rounded-sm px-6 py-2 font-medium transition-all duration-300 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Upload size={18} />
+                      <span>Add Image</span>
+                    </button>
                   </form>
                 </div>
 
-                {/* Gallery Items Grid */}
-                <div className="grid md:grid-cols-3 gap-6">
-                  {galleryItems.map((item, idx) => (
-                    <div 
-                      key={item.id}
-                      className="bg-[#121212] border border-white/10 rounded-sm overflow-hidden group"
-                      data-testid={`gallery-item-${idx}`}
-                    >
-                      <div className="relative h-48">
-                        <img
-                          src={item.media_url}
-                          alt={item.title}
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute top-2 right-2">
-                          <button
-                            onClick={() => handleDeleteGalleryImage(item.id)}
-                            data-testid={`delete-gallery-${idx}`}
-                            className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-sm transition-colors"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
-                      </div>
-                      <div className="p-4">
-                        <h3 className="font-semibold text-white mb-1">{item.title}</h3>
-                        <p className="text-sm text-[#D4AF37]">{item.category}</p>
-                      </div>
-                    </div>
-                  ))}
+                <div className="mb-4 flex items-center space-x-2 text-[#D4AF37]">
+                  <GripVertical size={20} />
+                  <p className="text-sm font-medium">Drag images to reorder</p>
                 </div>
+
+                <DragDropContext onDragEnd={handleGalleryDragEnd}>
+                  <Droppable droppableId="gallery">
+                    {(provided) => (
+                      <div 
+                        {...provided.droppableProps}
+                        ref={provided.innerRef}
+                        className="grid md:grid-cols-3 gap-6"
+                      >
+                        {galleryItems.map((item, idx) => (
+                          <Draggable key={item.id} draggableId={item.id} index={idx}>
+                            {(provided, snapshot) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                className={`bg-[#121212] border border-white/10 rounded-sm overflow-hidden transition-all ${
+                                  snapshot.isDragging ? 'shadow-2xl shadow-[#D32F2F]/50 scale-105 rotate-2' : ''
+                                }`}
+                                data-testid={`gallery-item-${idx}`}
+                              >
+                                <div {...provided.dragHandleProps} className="cursor-grab active:cursor-grabbing">
+                                  <div className="relative h-48">
+                                    <img
+                                      src={item.media_url}
+                                      alt={item.title}
+                                      className="w-full h-full object-cover"
+                                    />
+                                    <div className="absolute top-2 left-2 bg-black/70 px-2 py-1 rounded-sm flex items-center space-x-1">
+                                      <GripVertical size={14} className="text-[#D4AF37]" />
+                                      <span className="text-xs text-white font-bold">#{idx + 1}</span>
+                                    </div>
+                                    <div className="absolute top-2 right-2 flex space-x-2">
+                                      <button
+                                        onClick={() => setPreviewImage(item.media_url)}
+                                        className="bg-[#D4AF37] hover:bg-[#C5A028] text-black p-2 rounded-sm transition-colors"
+                                      >
+                                        <Eye size={16} />
+                                      </button>
+                                      <button
+                                        onClick={() => handleDeleteGalleryImage(item.id)}
+                                        data-testid={`delete-gallery-${idx}`}
+                                        className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-sm transition-colors"
+                                      >
+                                        <Trash2 size={16} />
+                                      </button>
+                                    </div>
+                                  </div>
+                                  <div className="p-4">
+                                    <h3 className="font-semibold text-white mb-1">{item.title}</h3>
+                                    <p className="text-sm text-[#D4AF37]">{item.category}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </Draggable>
+                        ))}
+                        {provided.placeholder}
+                      </div>
+                    )}
+                  </Droppable>
+                </DragDropContext>
               </motion.div>
             )}
 
-            {/* Site Images Tab */}
             {activeTab === 'site-images' && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-              >
-                {/* Add Site Image Form */}
-                <div className="bg-[#121212] border border-white/10 p-6 rounded-sm mb-8">
-                  <h2 className="font-heading text-2xl font-bold mb-4 flex items-center space-x-2">
-                    <Plus size={24} className="text-[#D32F2F]" />
-                    <span>Add Site Image</span>
-                  </h2>
-                  <form onSubmit={handleAddSiteImage} className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-[#E5E5E5] mb-2">Section</label>
-                      <select
-                        value={newSiteImage.section}
-                        onChange={(e) => setNewSiteImage({...newSiteImage, section: e.target.value})}
-                        className="w-full bg-[#1A1A1A] border border-white/10 text-white px-4 py-2 rounded-sm"
-                        data-testid="site-section-select"
-                      >
-                        <option value="hero">Hero</option>
-                        <option value="featured">Featured</option>
-                        <option value="services">Services</option>
-                        <option value="about">About</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-[#E5E5E5] mb-2">Alt Text</label>
-                      <input
-                        type="text"
-                        value={newSiteImage.alt_text}
-                        onChange={(e) => setNewSiteImage({...newSiteImage, alt_text: e.target.value})}
-                        className="w-full bg-[#1A1A1A] border border-white/10 text-white px-4 py-2 rounded-sm"
-                        placeholder="Image description"
-                        data-testid="site-alt-input"
-                      />
-                    </div>
-                    <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-[#E5E5E5] mb-2">Image URL</label>
-                      <input
-                        type="url"
-                        value={newSiteImage.image_url}
-                        onChange={(e) => setNewSiteImage({...newSiteImage, image_url: e.target.value})}
-                        className="w-full bg-[#1A1A1A] border border-white/10 text-white px-4 py-2 rounded-sm"
-                        placeholder="https://..."
-                        required
-                        data-testid="site-url-input"
-                      />
-                    </div>
-                    <div className="md:col-span-2">
-                      <button
-                        type="submit"
-                        data-testid="add-site-image-button"
-                        className="bg-[#D32F2F] text-white hover:bg-[#B71C1C] rounded-sm px-6 py-2 font-medium transition-all duration-300 flex items-center space-x-2"
-                      >
-                        <Upload size={18} />
-                        <span>Add Site Image</span>
-                      </button>
-                    </div>
-                  </form>
-                </div>
-
-                {/* Site Images by Section */}
-                {['hero', 'featured', 'services', 'about'].map((section) => (
-                  <div key={section} className="mb-8">
-                    <h3 className="font-heading text-xl font-bold mb-4 flex items-center space-x-2 capitalize">
-                      {getSectionIcon(section)}
-                      <span>{section} Images</span>
-                    </h3>
-                    <div className="grid md:grid-cols-4 gap-4">
-                      {siteImages
-                        .filter(img => img.section === section)
-                        .sort((a, b) => a.order - b.order)
-                        .map((img, idx) => (
-                        <div 
-                          key={img.id}
-                          className="bg-[#121212] border border-white/10 rounded-sm overflow-hidden"
-                          data-testid={`site-image-${section}-${idx}`}
-                        >
-                          <div className="relative h-32">
-                            <img
-                              src={img.image_url}
-                              alt={img.alt_text}
-                              className="w-full h-full object-cover"
-                            />
-                            <button
-                              onClick={() => handleDeleteSiteImage(img.id)}
-                              data-testid={`delete-site-${section}-${idx}`}
-                              className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white p-1.5 rounded-sm"
-                            >
-                              <Trash2 size={14} />
-                            </button>
-                          </div>
-                          <div className="p-2">
-                            <p className="text-xs text-[#A3A3A3] truncate">{img.alt_text || 'No description'}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </motion.div>
+              <p className="text-center text-[#A3A3A3] py-10">Site images management - similar interface as gallery</p>
             )}
           </div>
         )}
       </div>
+
+      <AnimatePresence>
+        {previewImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4"
+            onClick={() => setPreviewImage(null)}
+            data-testid="preview-modal"
+          >
+            <button
+              onClick={() => setPreviewImage(null)}
+              data-testid="close-preview"
+              className="absolute top-4 right-4 text-white hover:text-[#D32F2F] transition-colors"
+            >
+              <X size={32} />
+            </button>
+            <motion.div
+              initial={{ scale: 0.8 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.8 }}
+              className="max-w-4xl w-full"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <img
+                src={previewImage}
+                alt="Preview"
+                className="w-full h-auto max-h-[80vh] object-contain rounded-sm"
+              />
+              <div className="mt-4 text-center">
+                <p className="text-[#D4AF37] text-sm">Click outside to close preview</p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

@@ -24,7 +24,9 @@ const Gallery = () => {
         // Seed with sample data if empty
         setGalleryItems(sampleGalleryData);
       } else {
-        setGalleryItems(response.data);
+        // Sort by order field
+        const sortedItems = response.data.sort((a, b) => (a.order || 0) - (b.order || 0));
+        setGalleryItems(sortedItems);
       }
     } catch (error) {
       console.error('Error fetching gallery:', error);
