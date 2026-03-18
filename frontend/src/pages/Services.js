@@ -335,17 +335,42 @@ const Services = () => {
             animate={{ opacity: 1, y: 0 }}
             className="fixed bottom-8 right-8 bg-[#121212] border-2 border-[#D4AF37] rounded-sm p-6 shadow-2xl shadow-[#D4AF37]/30 max-w-md z-40"
           >
-            <h3 className="font-heading text-xl font-bold mb-4 flex items-center space-x-2">
-              <Tag className="text-[#D4AF37]" />
-              <span>Your Selection</span>
-            </h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-heading text-xl font-bold flex items-center space-x-2">
+                <Tag className="text-[#D4AF37]" />
+                <span>Your Selection</span>
+              </h3>
+              <button
+                onClick={() => {
+                  setSelectedPackage(null);
+                  setSelectedAddOns([]);
+                  toast.info('Selection cleared');
+                }}
+                className="text-[#A3A3A3] hover:text-[#D32F2F] transition-colors"
+                title="Clear all selections"
+              >
+                <X size={24} />
+              </button>
+            </div>
             
             {selectedPackage && (
               <div className="mb-4 pb-4 border-b border-white/10">
                 <p className="text-sm text-[#A3A3A3] mb-1">Package</p>
                 <div className="flex justify-between items-center">
-                  <p className="font-semibold text-white">{selectedPackage.name}</p>
-                  <p className="text-[#D32F2F] font-bold">₹{selectedPackage.price.toLocaleString()}</p>
+                  <p className="font-semibold text-white flex-1">{selectedPackage.name}</p>
+                  <div className="flex items-center space-x-2">
+                    <p className="text-[#D32F2F] font-bold">₹{selectedPackage.price.toLocaleString()}</p>
+                    <button
+                      onClick={() => {
+                        setSelectedPackage(null);
+                        toast.info('Package removed');
+                      }}
+                      className="text-[#A3A3A3] hover:text-[#D32F2F] transition-colors"
+                      title="Remove package"
+                    >
+                      <X size={18} />
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
@@ -357,7 +382,16 @@ const Services = () => {
                   {selectedAddOns.map((addon, idx) => (
                     <div key={idx} className="flex justify-between items-start text-sm">
                       <p className="text-white flex-1 pr-2">{addon.name}</p>
-                      <p className="text-[#D32F2F] font-semibold">₹{addon.price.toLocaleString()}</p>
+                      <div className="flex items-center space-x-2">
+                        <p className="text-[#D32F2F] font-semibold">₹{addon.price.toLocaleString()}</p>
+                        <button
+                          onClick={() => toggleAddOn(addon)}
+                          className="text-[#A3A3A3] hover:text-[#D32F2F] transition-colors"
+                          title="Remove add-on"
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -536,7 +570,7 @@ const Services = () => {
             <ul className="space-y-3 text-sm text-[#A3A3A3]">
               <li className="flex items-start">
                 <span className="text-[#D32F2F] mr-2 flex-shrink-0">•</span>
-                <span>All raw photos will be provided on a pendrive after the event. Client must select preferred ones within 7 days.</span>
+                <span>All raw photos will be provided on <strong className="text-white">Google Drive</strong> after the event. Client must select preferred ones within 7 days.</span>
               </li>
               <li className="flex items-start">
                 <span className="text-[#D32F2F] mr-2 flex-shrink-0">•</span>
