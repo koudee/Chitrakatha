@@ -1,31 +1,41 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Play } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 const Home = () => {
-  const [heroImage, setHeroImage] = useState('');
+  const [currentSlide, setCurrentSlide] = useState(0);
   const [featuredImages, setFeaturedImages] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Hero slideshow images
+  const heroSlides = [
+    'https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/c7tws8fd_DRP_0150.jpg.jpeg',
+    'https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/1jyxdn7l_DRP_0213.jpg.jpeg',
+    'https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/dzf4ww5n_DRP_0484.jpg.jpeg'
+  ];
 
   useEffect(() => {
     fetchSiteImages();
   }, []);
 
+  // Auto-advance slideshow
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+    }, 5000); // Change slide every 5 seconds
+
+    return () => clearInterval(interval);
+  }, [heroSlides.length]);
+
   const fetchSiteImages = async () => {
     try {
       const response = await axios.get(`${API}/site-images`);
       const images = response.data;
-      
-      // Get hero images (use first one as main hero)
-      const heroImgs = images.filter(img => img.section === 'hero').sort((a, b) => a.order - b.order);
-      if (heroImgs.length > 0) {
-        setHeroImage(heroImgs[0].image_url);
-      }
       
       // Get featured images
       const featured = images.filter(img => img.section === 'featured').sort((a, b) => a.order - b.order).slice(0, 3);
@@ -41,19 +51,43 @@ const Home = () => {
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
+      {/* Hero Section with Slideshow */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        {/* Background Image */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage: heroImage ? `url('${heroImage}')` : 'none',
-            backgroundColor: heroImage ? 'transparent' : '#121212'
-          }}
-        />
+        {/* Slideshow Background */}
+        <div className="absolute inset-0">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentSlide}
+              initial={{ opacity: 0, scale: 1.1 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 1.5, ease: "easeInOut" }}
+              className="absolute inset-0 bg-cover bg-center"
+              style={{
+                backgroundImage: `url('${heroSlides[currentSlide]}')`
+              }}
+            />
+          </AnimatePresence>
+        </div>
         
         {/* Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-black/60 to-transparent" />
+        
+        {/* Slide Indicators */}
+        <div className="absolute bottom-32 left-1/2 transform -translate-x-1/2 flex space-x-3 z-20">
+          {heroSlides.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => setCurrentSlide(idx)}
+              className={`transition-all duration-500 ${
+                currentSlide === idx
+                  ? 'w-12 h-2 bg-[#D32F2F]'
+                  : 'w-2 h-2 bg-white/40 hover:bg-white/60'
+              } rounded-full`}
+              aria-label={`Go to slide ${idx + 1}`}
+            />
+          ))}
+        </div>
         
         {/* Content */}
         <motion.div 
