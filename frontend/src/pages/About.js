@@ -37,25 +37,29 @@ const About = () => {
       name: 'Upasak Mukherjee',
       specialty: 'Cinematographer & Photographer',
       description: 'Capturing authentic emotions with 6+ years of experience',
-      image: 'https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/66po98n1_000%20%281%29.jpg.jpeg'
+      image: 'https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/66po98n1_000%20%281%29.jpg.jpeg',
+      imgPos: 'center 20%'
     },
     {
       name: 'Deep Shekhar Ojha',
       specialty: 'Candid & Wide Photographer',
       description: 'Specialists in capturing genuine, unposed moments',
-      image: 'https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/63pucjxl_IMG_4001.JPG.jpeg'
+      image: 'https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/63pucjxl_IMG_4001.JPG.jpeg',
+      imgPos: 'center 30%'
     },
     {
       name: 'Debraj Roy',
       specialty: 'Candid & Portrait Photographer',
       description: 'Specialists in capturing genuine, unguarded moments',
-      image: 'https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/v0nopnby_IMG_4003.JPG.jpeg'
+      image: 'https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/v0nopnby_IMG_4003.JPG.jpeg',
+      imgPos: 'center 25%'
     },
     {
       name: 'Sandip Pal',
       specialty: 'Cinematographer',
       description: 'Creating cinematic stories with cutting-edge equipment',
-      image: 'https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/bg63o1bb_IMG_4002.JPG.jpeg'
+      image: 'https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/bg63o1bb_IMG_4002.JPG.jpeg',
+      imgPos: 'center 35%'
     }
   ];
 
@@ -64,13 +68,15 @@ const About = () => {
       name: 'Rudra Pratap Sen',
       specialty: 'Portrait Photographer',
       description: 'Specialists in capturing genuine, heartfelt moments',
-      image: ''
+      image: '',
+      imgPos: 'center'
     },
     {
       name: 'Abhirup Roy',
       specialty: 'Wide & Candid Photographer',
       description: 'Specialists in capturing genuine, authentic moments',
-      image: ''
+      image: '',
+      imgPos: 'center'
     }
   ];
 
@@ -188,11 +194,12 @@ const About = () => {
                 data-testid={`team-member-${idx}`}
               >
                 {member.image && (
-                  <div className="relative h-80 overflow-hidden">
+                  <div className="relative aspect-[3/4] overflow-hidden">
                     <img
                       src={member.image}
                       alt={member.name}
-                      className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-110"
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      style={{ objectPosition: member.imgPos }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#121212] via-transparent to-transparent group-hover:from-[#121212]/90 transition-all duration-500" />
                   </div>
@@ -219,13 +226,14 @@ const About = () => {
                 className="group bg-[#121212] border border-white/5 rounded-xl overflow-hidden hover:border-[#D4AF37]/50 hover:shadow-xl hover:shadow-[#D4AF37]/10 transition-all duration-500 w-full md:w-[calc(25%-1rem)] cursor-pointer"
                 data-testid={`team-member-${idx + 4}`}
               >
-                <div className="relative h-80 overflow-hidden bg-[#1A1A1A] flex items-center justify-center">
+                <div className="relative aspect-[3/4] overflow-hidden bg-[#1A1A1A] flex items-center justify-center">
                   {member.image ? (
                     <>
                       <img
                         src={member.image}
                         alt={member.name}
-                        className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-110"
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        style={{ objectPosition: member.imgPos }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-[#121212] via-transparent to-transparent group-hover:from-[#121212]/90 transition-all duration-500" />
                     </>
