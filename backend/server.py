@@ -1,5 +1,6 @@
 from fastapi import FastAPI, APIRouter, HTTPException, Depends, status, UploadFile, File
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.responses import FileResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -12,7 +13,6 @@ import uuid
 from datetime import datetime, timezone, timedelta
 import bcrypt
 import jwt
-import base64
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -317,22 +317,27 @@ async def admin_update_site_images_bulk(images: List[SiteImageCreate], user_id: 
 
 @api_router.post("/admin/upload-image", response_model=ImageUploadResponse)
 async def admin_upload_image(file: UploadFile = File(...), user_id: str = Depends(get_admin_user)):
-    """Upload image and return base64 data URL"""
+    """Upload image and save to disk, return URL"""
     try:
-        # Read file content
+        # Create uploads directory
+        upload_dir = ROOT_DIR / 'uploads'
+        upload_dir.mkdir(exist_ok=True)
+        
+        # Generate unique filename
+        ext = Path(file.filename).suffix or '.jpg'
+        filename = f"{uuid.uuid4().hex}{ext}"
+        file_path = upload_dir / filename
+        
+        # Save file to disk
         contents = await file.read()
+        with open(file_path, 'wb') as f:
+            f.write(contents)
         
-        # Convert to base64
-        base64_encoded = base64.b64encode(contents).decode('utf-8')
-        
-        # Determine mime type
-        mime_type = file.content_type or 'image/jpeg'
-        
-        # Create data URL
-        data_url = f"data:{mime_type};base64,{base64_encoded}"
+        # Return URL path
+        image_url = f"/api/uploads/{filename}"
         
         return ImageUploadResponse(
-            image_url=data_url,
+            image_url=image_url,
             message="Image uploaded successfully"
         )
     except Exception as e:
@@ -456,6 +461,14 @@ async def create_gallery_item(item: GalleryItem):
 @api_router.get("/")
 async def root():
     return {"message": "Chitrakatha API", "status": "active"}
+
+@api_router.get("/uploads/{filename}")
+async def serve_upload(filename: str):
+    """Serve uploaded images from disk"""
+    file_path = ROOT_DIR / 'uploads' / filename
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="File not found")
+    return FileResponse(file_path)
 
 # Include the router in the main app
 app.include_router(api_router)

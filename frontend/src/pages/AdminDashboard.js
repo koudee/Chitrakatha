@@ -111,11 +111,18 @@ const AdminDashboard = ({ onLogout }) => {
     for (let i = 0; i < files.length; i++) {
       setBatchProgress({ current: i + 1, total: files.length });
       try {
+        // Check file size - limit to 5MB for upload
+        if (files[i].size > 5 * 1024 * 1024) {
+          toast.error(`${files[i].name} is too large (max 5MB). Use URL upload instead.`);
+          continue;
+        }
+
         const formData = new FormData();
         formData.append('file', files[i]);
 
         const uploadRes = await axios.post(`${API}/admin/upload-image`, formData, {
-          headers: { ...headers, 'Content-Type': 'multipart/form-data' }
+          headers: { ...headers, 'Content-Type': 'multipart/form-data' },
+          timeout: 30000
         });
 
         const fileName = files[i].name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
@@ -139,6 +146,49 @@ const AdminDashboard = ({ onLogout }) => {
     
     if (successCount > 0) {
       toast.success(`${successCount} of ${files.length} images uploaded to ${category}`);
+      fetchData();
+    }
+  };
+
+  const handleBatchUrlUpload = async (urlsText, category) => {
+    const urls = urlsText.split('\n').map(u => u.trim()).filter(u => u.length > 0);
+    if (urls.length === 0) {
+      toast.error('Please enter at least one URL');
+      return;
+    }
+
+    setBatchUploading(true);
+    setBatchProgress({ current: 0, total: urls.length });
+    const token = localStorage.getItem('adminToken');
+    const headers = { Authorization: `Bearer ${token}` };
+    let successCount = 0;
+
+    for (let i = 0; i < urls.length; i++) {
+      setBatchProgress({ current: i + 1, total: urls.length });
+      try {
+        const urlParts = urls[i].split('/');
+        const fileName = decodeURIComponent(urlParts[urlParts.length - 1]).replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+        
+        await axios.post(`${API}/admin/gallery`, {
+          title: fileName || `Image ${i + 1}`,
+          category: category,
+          media_url: urls[i],
+          media_type: 'photo',
+          order: galleryItems.length + i
+        }, { headers });
+
+        successCount++;
+      } catch (error) {
+        console.error(`Failed to add URL ${i + 1}:`, error);
+        toast.error(`Failed URL ${i + 1}`);
+      }
+    }
+
+    setBatchUploading(false);
+    setBatchProgress({ current: 0, total: 0 });
+
+    if (successCount > 0) {
+      toast.success(`${successCount} of ${urls.length} images added to ${category}`);
       fetchData();
     }
   };
@@ -444,9 +494,9 @@ const AdminDashboard = ({ onLogout }) => {
                     <Upload size={24} className="text-[#D4AF37]" />
                     <span>Batch Upload Multiple Images</span>
                   </h2>
-                  <p className="text-sm text-[#A3A3A3] mb-4">Select multiple images at once and upload them to a category</p>
+                  <p className="text-sm text-[#A3A3A3] mb-4">Upload files (max 5MB each) or paste image URLs — one per line</p>
                   
-                  <div className="grid md:grid-cols-2 gap-4 items-end">
+                  <div className="grid md:grid-cols-3 gap-4 items-end">
                     <div>
                       <label className="block text-sm font-medium text-[#E5E5E5] mb-2">Category</label>
                       <select
@@ -462,7 +512,7 @@ const AdminDashboard = ({ onLogout }) => {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-[#E5E5E5] mb-2">Select Images</label>
+                      <label className="block text-sm font-medium text-[#E5E5E5] mb-2">Upload Files</label>
                       <label>
                         <input
                           type="file"
@@ -477,13 +527,42 @@ const AdminDashboard = ({ onLogout }) => {
                           }}
                           className="hidden"
                           data-testid="batch-upload-input"
+                          disabled={batchUploading}
                         />
-                        <div className="w-full btn-outline-gold text-center py-3 cursor-pointer flex items-center justify-center space-x-2">
+                        <div className={`w-full btn-outline-gold text-center py-3 cursor-pointer flex items-center justify-center space-x-2 ${batchUploading ? 'opacity-50 pointer-events-none' : ''}`}>
                           <Upload size={18} />
-                          <span>{batchUploading ? `Uploading ${batchProgress.current}/${batchProgress.total}...` : 'Choose Multiple Images'}</span>
+                          <span>{batchUploading ? `Uploading ${batchProgress.current}/${batchProgress.total}...` : 'Choose Files'}</span>
                         </div>
                       </label>
                     </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[#E5E5E5] mb-2">Or Add by URLs</label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const urls = document.getElementById('batch-urls').value;
+                          const category = document.getElementById('batch-category').value;
+                          handleBatchUrlUpload(urls, category);
+                          document.getElementById('batch-urls').value = '';
+                        }}
+                        disabled={batchUploading}
+                        className="w-full btn-primary-red py-3 flex items-center justify-center space-x-2 disabled:opacity-50"
+                        data-testid="batch-url-upload-btn"
+                      >
+                        <Plus size={18} />
+                        <span>Add URLs to Gallery</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="mt-4">
+                    <textarea
+                      id="batch-urls"
+                      rows={3}
+                      placeholder="Paste image URLs here — one per line&#10;https://example.com/image1.jpg&#10;https://example.com/image2.jpg"
+                      className="w-full bg-[#1A1A1A] border border-white/10 text-white px-4 py-3 rounded-lg text-sm placeholder-[#666] resize-none"
+                      data-testid="batch-urls-input"
+                    />
                   </div>
 
                   {batchUploading && (
@@ -494,7 +573,7 @@ const AdminDashboard = ({ onLogout }) => {
                           style={{ width: `${(batchProgress.current / batchProgress.total) * 100}%` }}
                         />
                       </div>
-                      <p className="text-sm text-[#D4AF37] mt-2">{batchProgress.current} of {batchProgress.total} images uploaded</p>
+                      <p className="text-sm text-[#D4AF37] mt-2">{batchProgress.current} of {batchProgress.total} images processed</p>
                     </div>
                   )}
                 </div>
