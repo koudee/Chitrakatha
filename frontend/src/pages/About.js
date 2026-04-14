@@ -75,8 +75,8 @@ const About = () => {
       name: 'Abhirup Roy',
       specialty: 'Wide & Candid Photographer',
       description: 'Specialists in capturing genuine, authentic moments',
-      image: '',
-      imgPos: 'center'
+      image: 'https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/7gzjxclu_ABH_9773.JPG.jpg.jpeg',
+      imgPos: 'center 25%'
     }
   ];
 
