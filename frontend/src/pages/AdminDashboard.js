@@ -79,7 +79,8 @@ const AdminDashboard = ({ onLogout }) => {
         headers: {
           ...headers,
           'Content-Type': 'multipart/form-data'
-        }
+        },
+        timeout: 120000
       });
 
       const imageUrl = response.data.image_url;
@@ -111,18 +112,12 @@ const AdminDashboard = ({ onLogout }) => {
     for (let i = 0; i < files.length; i++) {
       setBatchProgress({ current: i + 1, total: files.length });
       try {
-        // Check file size - limit to 5MB for upload
-        if (files[i].size > 5 * 1024 * 1024) {
-          toast.error(`${files[i].name} is too large (max 5MB). Use URL upload instead.`);
-          continue;
-        }
-
         const formData = new FormData();
         formData.append('file', files[i]);
 
         const uploadRes = await axios.post(`${API}/admin/upload-image`, formData, {
           headers: { ...headers, 'Content-Type': 'multipart/form-data' },
-          timeout: 30000
+          timeout: 120000
         });
 
         const fileName = files[i].name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
@@ -494,7 +489,7 @@ const AdminDashboard = ({ onLogout }) => {
                     <Upload size={24} className="text-[#D4AF37]" />
                     <span>Batch Upload Multiple Images</span>
                   </h2>
-                  <p className="text-sm text-[#A3A3A3] mb-4">Upload files (max 5MB each) or paste image URLs — one per line</p>
+                  <p className="text-sm text-[#A3A3A3] mb-4">Upload images of any size (auto-compressed) or paste image URLs — one per line</p>
                   
                   <div className="grid md:grid-cols-3 gap-4 items-end">
                     <div>

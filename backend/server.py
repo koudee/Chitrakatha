@@ -13,6 +13,8 @@ import uuid
 from datetime import datetime, timezone, timedelta
 import bcrypt
 import jwt
+from PIL import Image
+import io
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -317,23 +319,48 @@ async def admin_update_site_images_bulk(images: List[SiteImageCreate], user_id: 
 
 @api_router.post("/admin/upload-image", response_model=ImageUploadResponse)
 async def admin_upload_image(file: UploadFile = File(...), user_id: str = Depends(get_admin_user)):
-    """Upload image and save to disk, return URL"""
+    """Upload image of any size - auto-compresses large files"""
     try:
-        # Create uploads directory
         upload_dir = ROOT_DIR / 'uploads'
         upload_dir.mkdir(exist_ok=True)
         
-        # Generate unique filename
-        ext = Path(file.filename).suffix or '.jpg'
-        filename = f"{uuid.uuid4().hex}{ext}"
+        # Read file in chunks to handle large files
+        contents = bytearray()
+        while True:
+            chunk = await file.read(1024 * 1024)  # 1MB chunks
+            if not chunk:
+                break
+            contents.extend(chunk)
+        
+        # Compress if image is larger than 2MB
+        filename = f"{uuid.uuid4().hex}.jpg"
         file_path = upload_dir / filename
         
-        # Save file to disk
-        contents = await file.read()
-        with open(file_path, 'wb') as f:
-            f.write(contents)
+        if len(contents) > 2 * 1024 * 1024:
+            try:
+                img = Image.open(io.BytesIO(bytes(contents)))
+                img = img.convert('RGB')
+                # Resize if very large (keep max dimension 2000px)
+                max_dim = 2000
+                if img.width > max_dim or img.height > max_dim:
+                    ratio = min(max_dim / img.width, max_dim / img.height)
+                    new_size = (int(img.width * ratio), int(img.height * ratio))
+                    img = img.resize(new_size, Image.LANCZOS)
+                img.save(file_path, 'JPEG', quality=85, optimize=True)
+            except Exception:
+                # If PIL fails, save raw
+                ext = Path(file.filename).suffix or '.jpg'
+                filename = f"{uuid.uuid4().hex}{ext}"
+                file_path = upload_dir / filename
+                with open(file_path, 'wb') as f:
+                    f.write(bytes(contents))
+        else:
+            ext = Path(file.filename).suffix or '.jpg'
+            filename = f"{uuid.uuid4().hex}{ext}"
+            file_path = upload_dir / filename
+            with open(file_path, 'wb') as f:
+                f.write(bytes(contents))
         
-        # Return URL path
         image_url = f"/api/uploads/{filename}"
         
         return ImageUploadResponse(
