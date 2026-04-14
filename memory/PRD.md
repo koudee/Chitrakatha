@@ -23,6 +23,10 @@ Build a responsive website with a dashboard page, Gallery page, Service page, an
 - Team member images with `object-top` for face visibility
 - Rich cinematic background effects on Home page sections (radial glows, gradient overlays, separator lines)
 - **Custom button animation system**: All buttons redesigned with gradient backgrounds, shimmer sweep, glow pulse, fill-sweep, underline-sweep, and press-down click effects (btn-primary-red, btn-outline-gold, btn-book-red/gold, btn-filter, btn-category, btn-text-link)
+- **Admin batch upload**: Multiple image upload to gallery with category selection and progress bar
+- **Navbar hover animations**: Golden glow drop-shadow on hover, gradient underline sweep
+- **"About Us"**: Renamed from "About" across navbar and page title
+- **Team card hover animations**: All 6 members have lift-up, golden border glow, name turns gold, image zooms (scale-110) on hover
 
 ## Key Pages
 1. **Home** (`/`): Hero slideshow, featured work, packages preview, CTA
