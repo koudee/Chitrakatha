@@ -97,7 +97,7 @@ const Navbar = ({ isAuthenticated, onLogout }) => {
               <Link
                 to="/dashboard"
                 data-testid="nav-link-dashboard"
-                className={`ml-4 px-6 py-3 rounded-sm border transition-all duration-300 ${
+                className={`ml-4 px-6 py-3 rounded-lg border transition-all duration-300 ${
                   isActive('/dashboard')
                     ? 'bg-[#D32F2F] border-[#D32F2F] text-white'
                     : 'border-[#D4AF37]/30 text-[#D4AF37] hover:bg-[#D4AF37]/10 hover:border-[#D4AF37]'
@@ -112,7 +112,7 @@ const Navbar = ({ isAuthenticated, onLogout }) => {
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             data-testid="mobile-menu-toggle"
-            className="lg:hidden text-white p-2 hover:bg-white/10 rounded-sm transition-colors"
+            className="lg:hidden text-white p-2 hover:bg-white/10 rounded-lg transition-colors"
           >
             {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
           </button>
@@ -134,7 +134,7 @@ const Navbar = ({ isAuthenticated, onLogout }) => {
                     to={link.path}
                     onClick={() => setMobileMenuOpen(false)}
                     data-testid={`mobile-nav-link-${link.label.toLowerCase()}`}
-                    className={`block px-4 py-3 rounded-sm text-sm uppercase tracking-widest transition-all duration-300 ${
+                    className={`block px-4 py-3 rounded-lg text-sm uppercase tracking-widest transition-all duration-300 ${
                       isActive(link.path)
                         ? 'bg-[#D32F2F] text-white'
                         : 'text-white/90 hover:bg-white/5 hover:text-white'
@@ -148,7 +148,7 @@ const Navbar = ({ isAuthenticated, onLogout }) => {
                     to="/dashboard"
                     onClick={() => setMobileMenuOpen(false)}
                     data-testid="mobile-nav-link-dashboard"
-                    className={`block px-4 py-3 rounded-sm text-sm uppercase tracking-widest transition-all duration-300 ${
+                    className={`block px-4 py-3 rounded-lg text-sm uppercase tracking-widest transition-all duration-300 ${
                       isActive('/dashboard')
                         ? 'bg-[#D32F2F] text-white'
                         : 'text-[#D4AF37] hover:bg-[#D4AF37]/10'

@@ -67,7 +67,7 @@ const Gallery = () => {
               key={cat}
               onClick={() => setFilter(cat)}
               data-testid={`filter-${cat}`}
-              className={`px-6 py-2 rounded-sm text-sm uppercase tracking-widest transition-all duration-300 ${
+              className={`px-6 py-2 rounded-lg text-sm uppercase tracking-widest transition-all duration-300 ${
                 filter === cat
                   ? 'bg-[#D32F2F] text-white'
                   : 'border border-white/20 text-white hover:border-[#D32F2F]'

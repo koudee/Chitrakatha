@@ -26,27 +26,36 @@ const About = () => {
   };
 
   const stats = [
-    { icon: Camera, label: 'Projects Completed', value: '500+' },
-    { icon: Film, label: 'Hours of Footage', value: '10,000+' },
+    { icon: Camera, label: 'Projects Completed', value: '250+' },
+    { icon: Film, label: 'Hours of Footage', value: '5,000+' },
     { icon: Users, label: 'Happy Clients', value: '300+' },
-    { icon: Award, label: 'Years of Experience', value: '8+' }
+    { icon: Award, label: 'Years of Experience', value: '6+' }
   ];
 
   const team = [
     {
-      name: 'Lead Photographer',
-      specialty: 'Wedding & Portrait Photography',
-      description: 'Capturing authentic emotions with 8+ years of experience'
+      name: 'Upasak Mukherjee',
+      specialty: 'Cinematographer & Photographer',
+      description: 'Capturing authentic emotions with 6+ years of experience',
+      image: 'https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/66po98n1_000%20%281%29.jpg.jpeg'
     },
     {
-      name: 'Chief Cinematographer',
-      specialty: 'Cinematic Videography',
-      description: 'Creating cinematic stories with cutting-edge equipment'
+      name: 'Deep Shekhar Ojha',
+      specialty: 'Candid & Wide Photographer',
+      description: 'Specialists in capturing genuine, unposed moments',
+      image: 'https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/63pucjxl_IMG_4001.JPG.jpeg'
     },
     {
-      name: 'Candid Photography Team',
-      specialty: 'Raw & Unscripted Moments',
-      description: 'Specialists in capturing genuine, unposed moments'
+      name: 'Debraj Roy',
+      specialty: 'Candid & Portrait Photographer',
+      description: 'Specialists in capturing genuine, unguarded moments',
+      image: 'https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/v0nopnby_IMG_4003.JPG.jpeg'
+    },
+    {
+      name: 'Sandip Pal',
+      specialty: 'Cinematographer',
+      description: 'Creating cinematic stories with cutting-edge equipment',
+      image: 'https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/bg63o1bb_IMG_4002.JPG.jpeg'
     }
   ];
 
@@ -85,7 +94,7 @@ const About = () => {
                   and that's exactly what we do - we tell stories through pictures and films.
                 </p>
                 <p>
-                  Founded in Asansol, we've been capturing the essence of life's most precious moments for over 8 years. 
+                  Founded in Asansol, we've been capturing the essence of life's most precious moments for over 6 years. 
                   Our passion lies in creating timeless visual narratives that preserve emotions, celebrate love, and 
                   honor the beautiful chaos of weddings and special events.
                 </p>
@@ -101,10 +110,10 @@ const About = () => {
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
-              className="relative h-96 rounded-sm overflow-hidden"
+              className="relative h-96 rounded-xl overflow-hidden"
             >
               <img
-                src={aboutImage || 'https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/iuyyqp11_WhatsApp%20Image%202026-02-20%20at%2012.04.56%20AM%20%281%29.jpeg'}
+                src="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/84ethlvw_IMG_4004.JPG.jpeg"
                 alt="Chitrakatha Team"
                 className="w-full h-full object-cover"
               />
@@ -123,7 +132,7 @@ const About = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: idx * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-[#121212] border border-white/5 p-6 rounded-sm text-center hover:border-[#D32F2F]/30 transition-all duration-300"
+                className="bg-[#121212] border border-white/5 p-6 rounded-xl text-center hover:border-[#D32F2F]/30 transition-all duration-300"
                 data-testid={`stat-${idx}`}
               >
                 <stat.icon size={32} className="text-[#D32F2F] mx-auto mb-3" />
@@ -151,7 +160,7 @@ const About = () => {
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {team.map((member, idx) => (
               <motion.div
                 key={idx}
@@ -159,12 +168,24 @@ const About = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: idx * 0.2 }}
                 viewport={{ once: true }}
-                className="bg-[#121212] border border-white/5 p-6 rounded-sm hover:border-[#D4AF37]/30 transition-all duration-300"
+                className="bg-[#121212] border border-white/5 rounded-xl overflow-hidden hover:border-[#D4AF37]/30 transition-all duration-300"
                 data-testid={`team-member-${idx}`}
               >
-                <h3 className="font-heading text-xl font-bold mb-2">{member.name}</h3>
-                <p className="text-[#D32F2F] text-sm mb-3 uppercase tracking-widest">{member.specialty}</p>
-                <p className="text-sm text-[#A3A3A3] leading-relaxed">{member.description}</p>
+                {member.image && (
+                  <div className="relative h-80 overflow-hidden">
+                    <img
+                      src={member.image}
+                      alt={member.name}
+                      className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#121212] via-transparent to-transparent" />
+                  </div>
+                )}
+                <div className="p-6">
+                  <h3 className="font-heading text-xl font-bold mb-2">{member.name}</h3>
+                  <p className="text-[#D32F2F] text-sm mb-3 uppercase tracking-widest">{member.specialty}</p>
+                  <p className="text-sm text-[#A3A3A3] leading-relaxed">{member.description}</p>
+                </div>
               </motion.div>
             ))}
           </div>
@@ -177,7 +198,7 @@ const About = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="bg-gradient-to-br from-[#D32F2F]/10 to-[#D4AF37]/10 border border-[#D32F2F]/20 p-8 md:p-12 rounded-sm text-center"
+            className="bg-gradient-to-br from-[#D32F2F]/10 to-[#D4AF37]/10 border border-[#D32F2F]/20 p-8 md:p-12 rounded-xl text-center"
           >
             <h2 className="font-heading text-3xl md:text-4xl font-bold mb-6" data-testid="philosophy-title">
               Our <span className="text-[#D4AF37]">Philosophy</span>

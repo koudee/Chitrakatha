@@ -112,7 +112,7 @@ const Home = () => {
             <Link
               to="/services"
               data-testid="cta-view-packages"
-              className="bg-[#D32F2F] text-white hover:bg-[#B71C1C] rounded-sm px-8 py-3 font-medium transition-all duration-300 flex items-center space-x-2 group"
+              className="bg-[#D32F2F] text-white hover:bg-[#B71C1C] rounded-lg px-8 py-3 font-medium transition-all duration-300 flex items-center space-x-2 group"
             >
               <span>View Our Packages</span>
               <ArrowRight className="group-hover:translate-x-1 transition-transform" size={20} />
@@ -120,7 +120,7 @@ const Home = () => {
             <Link
               to="/gallery"
               data-testid="cta-explore-gallery"
-              className="border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black rounded-sm px-8 py-3 font-medium transition-all duration-300 flex items-center space-x-2"
+              className="border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black rounded-lg px-8 py-3 font-medium transition-all duration-300 flex items-center space-x-2"
             >
               <Play size={20} />
               <span>Explore Gallery</span>
@@ -172,7 +172,7 @@ const Home = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: idx * 0.2 }}
                   viewport={{ once: true }}
-                  className="relative group overflow-hidden cursor-pointer h-96"
+                  className="relative group overflow-hidden cursor-pointer h-96 rounded-xl"
                   data-testid={`featured-item-${idx}`}
                 >
                   <img
@@ -197,7 +197,7 @@ const Home = () => {
             <Link
               to="/gallery"
               data-testid="view-full-gallery-button"
-              className="inline-flex items-center space-x-2 border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black rounded-sm px-8 py-3 font-medium transition-all duration-300"
+              className="inline-flex items-center space-x-2 border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black rounded-lg px-8 py-3 font-medium transition-all duration-300"
             >
               <span>View Full Gallery</span>
               <ArrowRight size={20} />
@@ -237,7 +237,7 @@ const Home = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: idx * 0.1 }}
                 viewport={{ once: true }}
-                className={`bg-[#121212] rounded-sm overflow-hidden transition-all duration-500 hover:transform hover:scale-105 ${
+                className={`bg-[#121212] rounded-xl overflow-hidden transition-all duration-500 hover:transform hover:scale-105 ${
                   pkg.highlight ? 'border-2 border-[#D4AF37]' : 'border border-white/5 hover:border-[#D4AF37]/30'
                 }`}
                 data-testid={`package-preview-${pkg.name.toLowerCase().replace(' ', '-')}`}
@@ -279,7 +279,7 @@ const Home = () => {
             <Link
               to="/services"
               data-testid="view-all-packages-button"
-              className="inline-flex items-center space-x-2 bg-[#D32F2F] text-white hover:bg-[#B71C1C] rounded-sm px-8 py-3 font-medium transition-all duration-300"
+              className="inline-flex items-center space-x-2 bg-[#D32F2F] text-white hover:bg-[#B71C1C] rounded-lg px-8 py-3 font-medium transition-all duration-300"
             >
               <span>View All Packages</span>
               <ArrowRight size={20} />

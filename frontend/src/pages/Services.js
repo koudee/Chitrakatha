@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, Plus, Tag, X, Phone, Mail, MessageCircle, CheckCircle } from 'lucide-react';
+import { Check, Plus, Tag, X, Phone, Mail, MessageCircle, CheckCircle, Heart, Baby, Camera } from 'lucide-react';
 import { toast } from 'sonner';
 import axios from 'axios';
 
@@ -8,6 +8,7 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 const Services = () => {
+  const [activeCategory, setActiveCategory] = useState('wedding');
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [selectedAddOns, setSelectedAddOns] = useState([]);
   const [showContactModal, setShowContactModal] = useState(false);
@@ -55,7 +56,14 @@ const Services = () => {
     setShowContactModal(true);
   };
 
-  const packages = [
+  const categories = [
+    { id: 'wedding', label: 'Wedding', icon: Heart },
+    { id: 'prewedding', label: 'Pre-Wedding', icon: Camera },
+    { id: 'kids', label: 'Kids', icon: Baby }
+  ];
+
+  // Wedding Packages
+  const weddingPackages = [
     {
       name: 'Traditional',
       originalPrice: 95000,
@@ -70,7 +78,8 @@ const Services = () => {
         '2 Pendrives',
         '1 Photographer & 1 Videographer (each side)',
         '3 Days Coverage'
-      ]
+      ],
+      imageIndex: 0
     },
     {
       name: 'Semi-Cinematic',
@@ -88,7 +97,8 @@ const Services = () => {
         '2 Pendrives',
         '1 Photographer & 1 Videographer (each side)',
         '3 Days Coverage'
-      ]
+      ],
+      imageIndex: 1
     },
     {
       name: 'Cinematic',
@@ -107,9 +117,10 @@ const Services = () => {
         'Cinematic Wedding Trailer',
         '3 Reels',
         '2 Pendrive & box',
-        '1 Photographer, 1 Cinematographer & 1 Candid Photographer (on the wedding & reception day)',
+        '1 Photographer, 1 Cinematographer & 1 Candid Photographer',
         '3 Days Coverage'
-      ]
+      ],
+      imageIndex: 2
     },
     {
       name: 'Premium Cinematic',
@@ -132,146 +143,262 @@ const Services = () => {
         '1 Pendrive & Box',
         'Drone on Wedding Day & Reception Day',
         '4 Days Coverage'
+      ],
+      imageIndex: 3
+    }
+  ];
+
+  // Pre-Wedding Packages
+  const preWeddingPackages = [
+    {
+      name: '1 Day Pre-Wedding Shoot',
+      originalPrice: 22000,
+      price: 20000,
+      discount: 9,
+      duration: '1 Day',
+      features: [
+        '15 Edited Photos',
+        '3-4 mins Cinematic Video',
+        '1 Cinematic Coming Soon Reel',
+        'Within 100kms coverage',
+        'Professional photographer & videographer'
+      ],
+      note: 'Travelling, fooding, lodging separate'
+    },
+    {
+      name: 'Premium Pre-Wedding Shoot',
+      originalPrice: 37000,
+      price: 35000,
+      discount: 5,
+      duration: '2 Days',
+      highlight: true,
+      features: [
+        '2 Days Pre-wedding Shoot',
+        '20-25 Fully Skin Retouched Photos',
+        'All Raw Photos',
+        '3-4 Mins Cinematic Video',
+        '30-40 secs Teaser Video',
+        '1 Reel',
+        '1 Day Drone Coverage',
+        'Any Location'
+      ],
+      note: 'Travelling, fooding, lodging separate'
+    }
+  ];
+
+  // Kids Packages
+  const kidsPackages = [
+    {
+      name: 'Traditional Package',
+      originalPrice: 19000,
+      price: 17000,
+      discount: 11,
+      duration: 'Event Day',
+      features: [
+        '1 12X18 Standard 20 Sheet Album (120 images)',
+        '1 Traditional Video (40-50 minutes)',
+        'All Raw Photos',
+        'Professional coverage'
+      ]
+    },
+    {
+      name: 'Semi Cinematic Package',
+      originalPrice: 22000,
+      price: 20000,
+      discount: 9,
+      duration: 'Event Day',
+      features: [
+        '1 12X18 25 Sheet Album (150-160 images)',
+        'Leather Bag & Calendar',
+        '1 Semi Cinematic Video (20 minutes)',
+        'All Raw Photos'
+      ]
+    },
+    {
+      name: 'Full Cinematic Package',
+      originalPrice: 27000,
+      price: 25000,
+      discount: 7,
+      duration: 'Event Day + Bonus',
+      highlight: true,
+      features: [
+        '1 Combo Album of 25 Sheet NT Glossy (150-160 images)',
+        'Mini Replica Book',
+        'Leather Bag',
+        '1 Full Cinematic Video (10-15 minutes)',
+        '1 Trailer (2-3 minutes)',
+        'Pendrive with All Raw Photos',
+        '1 Complimentary 2hrs Baby Shoot (Separate Day)'
+      ]
+    },
+    {
+      name: 'Birthday Package',
+      originalPrice: 20000,
+      price: 18000,
+      discount: 10,
+      duration: 'Event Day',
+      features: [
+        '1 (9X12) Standard 15 Sheet Album (100 images)',
+        '1 Cinematic Video (10-15 minutes)',
+        'All Raw Photos',
+        'Complete birthday coverage'
       ]
     }
   ];
 
-  const addOns = [
-    { 
-      name: 'Pre/Post Wedding Photography with Selected Edits', 
-      originalPrice: 12000,
-      price: 10000, 
-      description: '1-day shoot in Asansol' 
-    },
-    { 
-      name: 'Pre/Post Wedding Cinematography with Edit', 
-      originalPrice: 12000,
-      price: 10000, 
-      description: '1-day shoot in Asansol (excluding drone)' 
-    },
-    { 
-      name: 'Additional 1 Day Prewedding Shoot', 
-      originalPrice: 12000,
-      price: 10000, 
-      description: 'Extended pre-wedding coverage' 
-    },
-    { 
-      name: 'Aiburo Bhat + Mehendi Photography + Videography', 
-      originalPrice: 12000,
-      price: 10000, 
-      description: 'Complete coverage (separate charges for bride & groom sides)' 
-    },
-    { 
-      name: 'Dodhi Mangal Photography', 
-      originalPrice: 6000,
-      price: 4000, 
-      description: 'Early morning event (separate charges for bride & groom sides)' 
-    },
-    { 
-      name: 'Drone Usage', 
-      originalPrice: 8000,
-      price: 6000, 
-      description: 'Per day coverage - Local' 
-    },
-    { 
-      name: 'Additional Candid Photographer', 
-      originalPrice: 7000,
-      price: 5000, 
-      description: 'Per day - Local' 
+  const getCurrentPackages = () => {
+    switch(activeCategory) {
+      case 'prewedding': return preWeddingPackages;
+      case 'kids': return kidsPackages;
+      default: return weddingPackages;
     }
-  ];
+  };
 
   return (
     <div className="min-h-screen pt-32 pb-20 px-4 md:px-8">
-      <div className="container mx-auto">
+      <div className="container mx-auto max-w-7xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="text-center mb-16"
+          className="text-center mb-12"
         >
-          <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold mb-4" data-testid="services-title">
+          <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
             Our <span className="text-[#D4AF37]">Services</span>
           </h1>
-          <p className="text-lg text-[#A3A3A3] max-w-3xl mx-auto">
-            Choose the perfect package for your special day. Each package includes both bride and groom side coverage.
+          <p className="text-lg text-[#A3A3A3] max-w-3xl mx-auto mb-8">
+            Choose the perfect package for your special moments
           </p>
-          <div className="mt-4 inline-flex items-center space-x-2 bg-[#D32F2F]/10 border border-[#D32F2F]/30 rounded-sm px-6 py-3">
-            <Tag className="text-[#D32F2F]" size={20} />
-            <span className="text-[#D32F2F] font-semibold">Limited Time Offer - Save up to 16%!</span>
+
+          {/* Category Tabs */}
+          <div className="flex flex-wrap justify-center gap-4 mb-12">
+            {categories.map((cat) => {
+              const Icon = cat.icon;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => setActiveCategory(cat.id)}
+                  className={`flex items-center space-x-3 px-8 py-4 rounded-xl font-medium transition-all duration-300 ${
+                    activeCategory === cat.id
+                      ? 'bg-[#D32F2F] text-white shadow-lg shadow-[#D32F2F]/30 scale-105'
+                      : 'bg-[#121212] text-[#A3A3A3] hover:text-white hover:bg-[#1A1A1A] border border-white/5'
+                  }`}
+                >
+                  <Icon size={24} />
+                  <span className="text-lg">{cat.label}</span>
+                </button>
+              );
+            })}
           </div>
         </motion.div>
 
-        {/* Main Packages */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
-          {packages.map((pkg, idx) => (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: idx * 0.1 }}
-              className={`bg-[#121212] rounded-sm overflow-hidden group relative ${
-                pkg.highlight 
-                  ? 'border-2 border-[#D4AF37] shadow-lg shadow-[#D4AF37]/20' 
-                  : 'border border-white/5 hover:border-[#D4AF37]/30'
-              } transition-all duration-500`}
-              data-testid={`package-${pkg.name.toLowerCase().replace(' ', '-')}`}
-            >
-              <div className="relative h-48 overflow-hidden">
-                <img
-                  src={serviceImages[idx]?.image_url || ''}
-                  alt={pkg.name}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#121212] to-transparent" />
-                {pkg.highlight && (
-                  <div className="absolute top-4 right-4 bg-[#D4AF37] text-black px-4 py-1 text-xs font-bold uppercase tracking-widest">
-                    Most Popular
+        {/* Packages Grid */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeCategory}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.5 }}
+            className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16"
+          >
+            {getCurrentPackages().map((pkg, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, delay: idx * 0.1 }}
+                whileHover={{ y: -8, transition: { duration: 0.3 } }}
+                className={`bg-[#121212] rounded-2xl overflow-hidden group relative ${
+                  pkg.highlight 
+                    ? 'border-2 border-[#D4AF37] shadow-2xl shadow-[#D4AF37]/20' 
+                    : 'border border-white/10 hover:border-[#D32F2F]/50'
+                }`}
+              >
+                {/* Image Section - Larger */}
+                <div className="relative h-72 overflow-hidden">
+                  {serviceImages[pkg.imageIndex || idx] && (
+                    <img
+                      src={serviceImages[pkg.imageIndex || idx]?.image_url}
+                      alt={pkg.name}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#121212] via-transparent to-transparent" />
+                  
+                  {/* Badges */}
+                  <div className="absolute top-4 left-4 flex flex-col gap-2">
+                    {pkg.discount && (
+                      <span className="bg-[#D32F2F] text-white px-4 py-2 rounded-lg text-sm font-bold shadow-lg">
+                        {pkg.discount}% OFF
+                      </span>
+                    )}
                   </div>
-                )}
-                <div className="absolute top-4 left-4 bg-[#D32F2F] text-white px-3 py-1 rounded-sm text-xs font-bold">
-                  {pkg.discount}% OFF
+                  
+                  {pkg.highlight && (
+                    <div className="absolute top-4 right-4 bg-[#D4AF37] text-black px-4 py-2 rounded-lg text-sm font-bold shadow-lg">
+                      POPULAR
+                    </div>
+                  )}
                 </div>
-              </div>
 
-              <div className="p-6">
-                <h3 className="font-heading text-2xl font-bold mb-2" data-testid={`package-name-${idx}`}>{pkg.name}</h3>
-                <p className="text-sm text-[#A3A3A3] mb-4">{pkg.duration}</p>
-                
-                <div className="mb-4">
-                  <div className="flex items-center space-x-3 mb-1">
-                    <span className="text-lg text-[#A3A3A3] line-through">₹{(pkg.originalPrice / 1000).toFixed(0)}k</span>
-                    <span className="text-3xl font-bold text-[#D32F2F]">₹{(pkg.price / 1000).toFixed(0)}k</span>
+                {/* Content Section - Spacious */}
+                <div className="p-8">
+                  <h3 className="font-heading text-3xl font-bold mb-3">{pkg.name}</h3>
+                  <p className="text-[#D4AF37] text-sm mb-4 font-medium">{pkg.duration}</p>
+                  
+                  {/* Pricing */}
+                  <div className="mb-6">
+                    <div className="flex items-center space-x-3 mb-2">
+                      {pkg.originalPrice && (
+                        <span className="text-xl text-[#A3A3A3] line-through">
+                          ₹{(pkg.originalPrice / 1000).toFixed(0)}k
+                        </span>
+                      )}
+                      <span className="text-4xl font-bold text-[#D32F2F]">
+                        ₹{(pkg.price / 1000).toFixed(0)}k
+                      </span>
+                    </div>
+                    {pkg.originalPrice && (
+                      <p className="text-sm text-[#D4AF37]">
+                        Save ₹{((pkg.originalPrice - pkg.price) / 1000).toFixed(0)}k
+                      </p>
+                    )}
                   </div>
-                  <p className="text-xs text-[#D4AF37]">Save ₹{((pkg.originalPrice - pkg.price) / 1000).toFixed(0)}k • Both Sides</p>
+
+                  {/* Features */}
+                  <ul className="space-y-3 mb-6">
+                    {pkg.features.map((feature, fidx) => (
+                      <li key={fidx} className="flex items-start text-[#A3A3A3]">
+                        <Check size={20} className="text-[#D4AF37] mr-3 flex-shrink-0 mt-0.5" />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  {pkg.note && (
+                    <p className="text-xs text-[#A3A3A3] italic mb-6 bg-[#1A1A1A] p-3 rounded-lg">
+                      * {pkg.note}
+                    </p>
+                  )}
+
+                  <button
+                    onClick={() => handleBookPackage(pkg)}
+                    className={`w-full py-4 rounded-xl font-semibold text-lg transition-all duration-300 ${
+                      pkg.highlight
+                        ? 'bg-[#D4AF37] text-black hover:bg-[#C5A028] shadow-lg shadow-[#D4AF37]/30'
+                        : 'bg-[#D32F2F] text-white hover:bg-[#B71C1C] shadow-lg shadow-[#D32F2F]/30'
+                    }`}
+                  >
+                    Book Now
+                  </button>
                 </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </AnimatePresence>
 
-                <ul className="space-y-3 mb-6">
-                  {pkg.features.map((feature, fidx) => (
-                    <li key={fidx} className="flex items-start text-sm text-[#A3A3A3]">
-                      <Check size={16} className="text-[#D4AF37] mr-2 flex-shrink-0 mt-0.5" />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <button
-                  onClick={() => handleBookPackage(pkg)}
-                  data-testid={`book-package-${idx}`}
-                  className={`w-full py-3 rounded-sm font-medium transition-all duration-300 ${
-                    pkg.highlight
-                      ? 'bg-[#D4AF37] text-black hover:bg-[#C5A028]'
-                      : 'bg-[#D32F2F] text-white hover:bg-[#B71C1C]'
-                  }`}
-                >
-                  Book Now
-                </button>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Add-On Services */}
+        {/* Add-On Services Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -279,138 +406,143 @@ const Services = () => {
           viewport={{ once: true }}
           className="mb-20"
         >
-          <h2 className="font-heading text-3xl md:text-4xl font-bold mb-4 text-center" data-testid="addon-services-title">
+          <h2 className="font-heading text-3xl md:text-4xl font-bold mb-4 text-center">
             Add-On <span className="text-[#D32F2F]">Services</span>
           </h2>
-          <p className="text-center text-[#A3A3A3] mb-8">Click + to add services to your package</p>
+          <p className="text-center text-[#A3A3A3] mb-12 text-lg">Enhance your package with additional services</p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {addOns.map((addon, idx) => {
-              const isSelected = isAddOnSelected(addon.name);
-              return (
-                <motion.div
-                  key={idx}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: idx * 0.05 }}
-                  viewport={{ once: true }}
-                  className={`bg-[#121212] border p-6 rounded-sm transition-all duration-300 cursor-pointer ${
-                    isSelected 
-                      ? 'border-[#D4AF37] shadow-lg shadow-[#D4AF37]/20' 
-                      : 'border-white/5 hover:border-[#D32F2F]/30'
-                  }`}
-                  onClick={() => toggleAddOn(addon)}
-                  data-testid={`addon-${idx}`}
-                >
-                  <div className="flex items-start justify-between mb-3">
-                    <h3 className="font-heading text-lg font-bold flex-1">{addon.name}</h3>
-                    <button
-                      className={`flex-shrink-0 ml-2 transition-all duration-300 ${
-                        isSelected 
-                          ? 'text-[#D4AF37] rotate-45' 
-                          : 'text-[#D4AF37] hover:scale-110'
-                      }`}
-                    >
-                      {isSelected ? <CheckCircle size={24} fill="#D4AF37" /> : <Plus size={20} />}
-                    </button>
-                  </div>
-                  <p className="text-sm text-[#A3A3A3] mb-4">{addon.description}</p>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm text-[#A3A3A3] line-through">₹{addon.originalPrice.toLocaleString()}</span>
-                    <span className="text-2xl font-bold text-[#D32F2F]">₹{addon.price.toLocaleString()}</span>
-                  </div>
-                  {addon.originalPrice > addon.price && (
-                    <p className="text-xs text-[#D4AF37] mt-1">Save ₹{(addon.originalPrice - addon.price).toLocaleString()}</p>
-                  )}
-                </motion.div>
-              );
-            })}
+            {[
+              { name: 'Pre/Post Wedding Photography with Selected Edits', originalPrice: 12000, price: 10000, description: '1-day shoot in Asansol' },
+              { name: 'Pre/Post Wedding Cinematography with Edit', originalPrice: 12000, price: 10000, description: '1-day shoot (excluding drone)' },
+              { name: 'Additional 1 Day Prewedding Shoot', originalPrice: 12000, price: 10000, description: 'Extended coverage' },
+              { name: 'Aiburo Bhat + Mehendi Photography + Videography', originalPrice: 12000, price: 10000, description: 'Complete coverage (separate charges for both sides)' },
+              { name: 'Dodhi Mangal Photography', originalPrice: 6000, price: 4000, description: 'Early morning event (separate charges)' },
+              { name: 'Drone Usage', originalPrice: 8000, price: 6000, description: 'Per day - Local' },
+              { name: 'Additional Candid Photographer', originalPrice: 7000, price: 5000, description: 'Per day - Local' }
+            ].map((addon, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: idx * 0.05 }}
+                viewport={{ once: true }}
+                whileHover={{ y: -5, transition: { duration: 0.3 } }}
+                className="bg-[#121212] border border-white/10 p-6 rounded-2xl hover:border-[#D32F2F]/50 transition-all duration-300"
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <h3 className="font-heading text-lg font-bold flex-1 text-white">{addon.name}</h3>
+                  <Plus size={20} className="text-[#D4AF37] flex-shrink-0 ml-2" />
+                </div>
+                <p className="text-sm text-[#A3A3A3] mb-4">{addon.description}</p>
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-[#A3A3A3] line-through">₹{addon.originalPrice.toLocaleString()}</span>
+                  <span className="text-2xl font-bold text-[#D32F2F]">₹{addon.price.toLocaleString()}</span>
+                </div>
+                <p className="text-xs text-[#D4AF37] mt-1">Save ₹{(addon.originalPrice - addon.price).toLocaleString()}</p>
+              </motion.div>
+            ))}
           </div>
         </motion.div>
 
-        {/* Selected Services Summary - Floating */}
-        {(selectedPackage || selectedAddOns.length > 0) && (
-          <motion.div
-            initial={{ opacity: 0, y: 100 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="fixed bottom-8 right-8 bg-[#121212] border-2 border-[#D4AF37] rounded-sm p-6 shadow-2xl shadow-[#D4AF37]/30 max-w-md z-40"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-heading text-xl font-bold flex items-center space-x-2">
-                <Tag className="text-[#D4AF37]" />
-                <span>Your Selection</span>
+        {/* Terms & Conditions */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+          className="bg-[#121212] border border-white/10 p-8 md:p-12 rounded-2xl"
+        >
+          <h2 className="font-heading text-3xl font-bold mb-8 text-center">
+            Payment Terms & <span className="text-[#D4AF37]">Delivery Timeline</span>
+          </h2>
+          
+          <div className="grid md:grid-cols-2 gap-12 text-sm text-[#A3A3A3] mb-12">
+            <div>
+              <h3 className="text-white font-semibold mb-6 text-xl flex items-center">
+                <span className="bg-[#D32F2F] text-white w-8 h-8 rounded-full flex items-center justify-center mr-3 text-sm">1</span>
+                Payment Schedule
               </h3>
-              <button
-                onClick={() => {
-                  setSelectedPackage(null);
-                  setSelectedAddOns([]);
-                  toast.info('Selection cleared');
-                }}
-                className="text-[#A3A3A3] hover:text-[#D32F2F] transition-colors"
-                title="Clear all selections"
-              >
-                <X size={24} />
-              </button>
+              <ul className="space-y-4">
+                <li className="flex items-start bg-[#1A1A1A] p-4 rounded-xl">
+                  <Check size={20} className="text-[#D4AF37] mr-3 flex-shrink-0 mt-0.5" />
+                  <span><strong className="text-white">15%</strong> due upon booking</span>
+                </li>
+                <li className="flex items-start bg-[#1A1A1A] p-4 rounded-xl">
+                  <Check size={20} className="text-[#D4AF37] mr-3 flex-shrink-0 mt-0.5" />
+                  <span><strong className="text-white">35%</strong> before the event day</span>
+                </li>
+                <li className="flex items-start bg-[#1A1A1A] p-4 rounded-xl">
+                  <Check size={20} className="text-[#D4AF37] mr-3 flex-shrink-0 mt-0.5" />
+                  <span><strong className="text-white">40%</strong> after the event</span>
+                </li>
+                <li className="flex items-start bg-[#1A1A1A] p-4 rounded-xl">
+                  <Check size={20} className="text-[#D4AF37] mr-3 flex-shrink-0 mt-0.5" />
+                  <span>Remaining <strong className="text-white">10%</strong> on album delivery</span>
+                </li>
+              </ul>
             </div>
             
-            {selectedPackage && (
-              <div className="mb-4 pb-4 border-b border-white/10">
-                <p className="text-sm text-[#A3A3A3] mb-1">Package</p>
-                <div className="flex justify-between items-center">
-                  <p className="font-semibold text-white flex-1">{selectedPackage.name}</p>
-                  <div className="flex items-center space-x-2">
-                    <p className="text-[#D32F2F] font-bold">₹{selectedPackage.price.toLocaleString()}</p>
-                    <button
-                      onClick={() => {
-                        setSelectedPackage(null);
-                        toast.info('Package removed');
-                      }}
-                      className="text-[#A3A3A3] hover:text-[#D32F2F] transition-colors"
-                      title="Remove package"
-                    >
-                      <X size={18} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-            
-            {selectedAddOns.length > 0 && (
-              <div className="mb-4 pb-4 border-b border-white/10">
-                <p className="text-sm text-[#A3A3A3] mb-2">Add-ons ({selectedAddOns.length})</p>
-                <div className="space-y-2">
-                  {selectedAddOns.map((addon, idx) => (
-                    <div key={idx} className="flex justify-between items-start text-sm">
-                      <p className="text-white flex-1 pr-2">{addon.name}</p>
-                      <div className="flex items-center space-x-2">
-                        <p className="text-[#D32F2F] font-semibold">₹{addon.price.toLocaleString()}</p>
-                        <button
-                          onClick={() => toggleAddOn(addon)}
-                          className="text-[#A3A3A3] hover:text-[#D32F2F] transition-colors"
-                          title="Remove add-on"
-                        >
-                          <X size={16} />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-            
-            <div className="flex justify-between items-center mb-4">
-              <p className="text-lg font-bold text-white">Total</p>
-              <p className="text-2xl font-bold text-[#D4AF37]">₹{calculateTotal().toLocaleString()}</p>
+            <div>
+              <h3 className="text-white font-semibold mb-6 text-xl flex items-center">
+                <span className="bg-[#D32F2F] text-white w-8 h-8 rounded-full flex items-center justify-center mr-3 text-sm">2</span>
+                Delivery Timeline
+              </h3>
+              <ul className="space-y-4">
+                <li className="flex items-start bg-[#1A1A1A] p-4 rounded-xl">
+                  <Check size={20} className="text-[#D4AF37] mr-3 flex-shrink-0 mt-0.5" />
+                  <span><strong className="text-white">Album:</strong> Maximum 50 days after selection</span>
+                </li>
+                <li className="flex items-start bg-[#1A1A1A] p-4 rounded-xl">
+                  <Check size={20} className="text-[#D4AF37] mr-3 flex-shrink-0 mt-0.5" />
+                  <span><strong className="text-white">Video:</strong> At least 90 days preparation time</span>
+                </li>
+                <li className="flex items-start bg-[#1A1A1A] p-4 rounded-xl">
+                  <Check size={20} className="text-[#D4AF37] mr-3 flex-shrink-0 mt-0.5" />
+                  <span><strong className="text-white">Collection:</strong> Within 15 days of completion</span>
+                </li>
+                <li className="flex items-start bg-[#1A1A1A] p-4 rounded-xl">
+                  <Check size={20} className="text-[#D4AF37] mr-3 flex-shrink-0 mt-0.5" />
+                  <span><strong className="text-white">Photo Selection:</strong> Within 7 days of receiving raw data</span>
+                </li>
+              </ul>
             </div>
-            
-            <button
-              onClick={() => setShowContactModal(true)}
-              className="w-full bg-[#D32F2F] text-white hover:bg-[#B71C1C] rounded-sm px-6 py-3 font-medium transition-all duration-300"
-            >
-              Get Quote & Book
-            </button>
-          </motion.div>
-        )}
+          </div>
+
+          <div className="border-t border-white/10 pt-8">
+            <h3 className="text-white font-semibold mb-6 text-xl">Terms & Conditions:</h3>
+            <ul className="space-y-4 text-sm text-[#A3A3A3]">
+              <li className="flex items-start bg-[#1A1A1A] p-4 rounded-xl">
+                <span className="text-[#D32F2F] mr-3 flex-shrink-0 mt-1">•</span>
+                <span>All raw photos will be provided on <strong className="text-white">Google Drive</strong> after the event. Client must select preferred ones within 7 days.</span>
+              </li>
+              <li className="flex items-start bg-[#1A1A1A] p-4 rounded-xl">
+                <span className="text-[#D32F2F] mr-3 flex-shrink-0 mt-1">•</span>
+                <span>Client is responsible for covering expenses related to food, lodging, and travel for crew members.</span>
+              </li>
+              <li className="flex items-start bg-[#1A1A1A] p-4 rounded-xl">
+                <span className="text-[#D32F2F] mr-3 flex-shrink-0 mt-1">•</span>
+                <span>Music used in the video must be provided by the client.</span>
+              </li>
+              <li className="flex items-start bg-[#1A1A1A] p-4 rounded-xl">
+                <span className="text-[#D32F2F] mr-3 flex-shrink-0 mt-1">•</span>
+                <span>Clients and their family must cooperate with photographers for better results.</span>
+              </li>
+              <li className="flex items-start bg-[#1A1A1A] p-4 rounded-xl">
+                <span className="text-[#D32F2F] mr-3 flex-shrink-0 mt-1">•</span>
+                <span>Minor changes in the video can be done once at no additional cost. Further changes will be subject to additional charges.</span>
+              </li>
+              <li className="flex items-start bg-[#1A1A1A] p-4 rounded-xl">
+                <span className="text-[#D4AF37] mr-3 flex-shrink-0 mt-1">•</span>
+                <span className="text-[#D4AF37]">Photographers will not be liable for dissatisfying output if clients/family do not cooperate.</span>
+              </li>
+              <li className="flex items-start bg-[#1A1A1A] p-4 rounded-xl">
+                <span className="text-[#D4AF37] mr-3 flex-shrink-0 mt-1">•</span>
+                <span className="text-[#D4AF37]">The photographer shall not be responsible for any data loss after six (6) months.</span>
+              </li>
+            </ul>
+          </div>
+        </motion.div>
 
         {/* Contact Modal */}
         <AnimatePresence>
@@ -426,7 +558,7 @@ const Services = () => {
                 initial={{ scale: 0.8 }}
                 animate={{ scale: 1 }}
                 exit={{ scale: 0.8 }}
-                className="bg-[#121212] border border-[#D4AF37] rounded-sm p-8 max-w-2xl w-full"
+                className="bg-[#121212] border-2 border-[#D4AF37] rounded-2xl p-8 max-w-2xl w-full"
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="flex justify-between items-start mb-6">
@@ -442,24 +574,21 @@ const Services = () => {
                 </div>
 
                 {selectedPackage && (
-                  <div className="bg-[#1A1A1A] border border-white/10 rounded-sm p-4 mb-6">
+                  <div className="bg-[#1A1A1A] border border-white/10 rounded-xl p-6 mb-6">
                     <p className="text-sm text-[#A3A3A3] mb-2">Selected Package</p>
                     <div className="flex justify-between items-center">
-                      <p className="font-semibold text-xl text-white">{selectedPackage.name}</p>
-                      <p className="text-2xl font-bold text-[#D32F2F]">₹{selectedPackage.price.toLocaleString()}</p>
+                      <p className="font-semibold text-2xl text-white">{selectedPackage.name}</p>
+                      <p className="text-3xl font-bold text-[#D32F2F]">₹{selectedPackage.price.toLocaleString()}</p>
                     </div>
-                    {selectedAddOns.length > 0 && (
-                      <p className="text-xs text-[#D4AF37] mt-2">+ {selectedAddOns.length} Add-on service(s)</p>
-                    )}
                   </div>
                 )}
 
                 <div className="space-y-4 mb-6">
                   <a 
                     href="tel:+919800000000"
-                    className="flex items-center space-x-4 bg-[#1A1A1A] border border-white/10 hover:border-[#D32F2F] rounded-sm p-4 transition-all duration-300 group"
+                    className="flex items-center space-x-4 bg-[#1A1A1A] border border-white/10 hover:border-[#D32F2F] rounded-xl p-4 transition-all duration-300 group"
                   >
-                    <div className="bg-[#D32F2F] p-3 rounded-sm group-hover:bg-[#B71C1C] transition-colors">
+                    <div className="bg-[#D32F2F] p-3 rounded-xl group-hover:bg-[#B71C1C] transition-colors">
                       <Phone size={24} className="text-white" />
                     </div>
                     <div>
@@ -469,12 +598,12 @@ const Services = () => {
                   </a>
 
                   <a 
-                    href="https://wa.me/919800000000?text=Hi%2C%20I%20want%20to%20book%20a%20photography%20package"
+                    href="https://wa.me/919800000000"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center space-x-4 bg-[#1A1A1A] border border-white/10 hover:border-[#25D366] rounded-sm p-4 transition-all duration-300 group"
+                    className="flex items-center space-x-4 bg-[#1A1A1A] border border-white/10 hover:border-[#25D366] rounded-xl p-4 transition-all duration-300 group"
                   >
-                    <div className="bg-[#25D366] p-3 rounded-sm group-hover:bg-[#1FA855] transition-colors">
+                    <div className="bg-[#25D366] p-3 rounded-xl group-hover:bg-[#1FA855] transition-colors">
                       <MessageCircle size={24} className="text-white" />
                     </div>
                     <div>
@@ -485,9 +614,9 @@ const Services = () => {
 
                   <a 
                     href="mailto:contact@chitrakatha.com"
-                    className="flex items-center space-x-4 bg-[#1A1A1A] border border-white/10 hover:border-[#D4AF37] rounded-sm p-4 transition-all duration-300 group"
+                    className="flex items-center space-x-4 bg-[#1A1A1A] border border-white/10 hover:border-[#D4AF37] rounded-xl p-4 transition-all duration-300 group"
                   >
-                    <div className="bg-[#D4AF37] p-3 rounded-sm group-hover:bg-[#C5A028] transition-colors">
+                    <div className="bg-[#D4AF37] p-3 rounded-xl group-hover:bg-[#C5A028] transition-colors">
                       <Mail size={24} className="text-black" />
                     </div>
                     <div>
@@ -497,108 +626,15 @@ const Services = () => {
                   </a>
                 </div>
 
-                <div className="bg-[#D32F2F]/10 border border-[#D32F2F]/30 rounded-sm p-4 text-center">
+                <div className="bg-[#D32F2F]/10 border border-[#D32F2F]/30 rounded-xl p-4 text-center">
                   <p className="text-sm text-[#E5E5E5]">
-                    Our team will get back to you within 24 hours to discuss your requirements and finalize the booking.
+                    Our team will get back to you within 24 hours
                   </p>
                 </div>
               </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
-
-        {/* Terms & Payment - Rest of the code remains same */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="bg-[#121212] border border-white/5 p-8 rounded-sm"
-        >
-          <h2 className="font-heading text-2xl font-bold mb-6" data-testid="terms-title">
-            Payment Terms & <span className="text-[#D4AF37]">Delivery Timeline</span>
-          </h2>
-          
-          <div className="grid md:grid-cols-2 gap-8 text-sm text-[#A3A3A3] mb-8">
-            <div>
-              <h3 className="text-white font-semibold mb-4 text-lg">Payment Schedule:</h3>
-              <ul className="space-y-2">
-                <li className="flex items-start">
-                  <Check size={16} className="text-[#D4AF37] mr-2 flex-shrink-0 mt-0.5" />
-                  <span><strong className="text-white">15%</strong> due upon booking</span>
-                </li>
-                <li className="flex items-start">
-                  <Check size={16} className="text-[#D4AF37] mr-2 flex-shrink-0 mt-0.5" />
-                  <span><strong className="text-white">35%</strong> before the wedding day</span>
-                </li>
-                <li className="flex items-start">
-                  <Check size={16} className="text-[#D4AF37] mr-2 flex-shrink-0 mt-0.5" />
-                  <span><strong className="text-white">40%</strong> after the event</span>
-                </li>
-                <li className="flex items-start">
-                  <Check size={16} className="text-[#D4AF37] mr-2 flex-shrink-0 mt-0.5" />
-                  <span>Remaining <strong className="text-white">10%</strong> on album delivery</span>
-                </li>
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className="text-white font-semibold mb-4 text-lg">Delivery Timeline:</h3>
-              <ul className="space-y-2">
-                <li className="flex items-start">
-                  <Check size={16} className="text-[#D4AF37] mr-2 flex-shrink-0 mt-0.5" />
-                  <span><strong className="text-white">Album:</strong> Maximum 50 days after selection</span>
-                </li>
-                <li className="flex items-start">
-                  <Check size={16} className="text-[#D4AF37] mr-2 flex-shrink-0 mt-0.5" />
-                  <span><strong className="text-white">Video:</strong> At least 90 days preparation time</span>
-                </li>
-                <li className="flex items-start">
-                  <Check size={16} className="text-[#D4AF37] mr-2 flex-shrink-0 mt-0.5" />
-                  <span><strong className="text-white">Collection:</strong> Within 15 days of completion</span>
-                </li>
-                <li className="flex items-start">
-                  <Check size={16} className="text-[#D4AF37] mr-2 flex-shrink-0 mt-0.5" />
-                  <span><strong className="text-white">Photo Selection:</strong> Must be completed within 7 days of receiving raw data</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="border-t border-white/10 pt-6">
-            <h3 className="text-white font-semibold mb-4 text-lg">Terms & Conditions:</h3>
-            <ul className="space-y-3 text-sm text-[#A3A3A3]">
-              <li className="flex items-start">
-                <span className="text-[#D32F2F] mr-2 flex-shrink-0">•</span>
-                <span>All raw photos will be provided on <strong className="text-white">Google Drive</strong> after the event. Client must select preferred ones within 7 days.</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-[#D32F2F] mr-2 flex-shrink-0">•</span>
-                <span>Client is responsible for covering expenses related to food, lodging, and travel for crew members.</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-[#D32F2F] mr-2 flex-shrink-0">•</span>
-                <span>Music used in the video must be provided by the client.</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-[#D32F2F] mr-2 flex-shrink-0">•</span>
-                <span>Clients and their family must cooperate with photographers for better results.</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-[#D32F2F] mr-2 flex-shrink-0">•</span>
-                <span>Minor changes in the video can be done once at no additional cost. Further changes will be subject to additional charges.</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-[#D32F2F] mr-2 flex-shrink-0">•</span>
-                <span className="text-[#D4AF37]">Photographers will not be liable for dissatisfying output if clients/family do not cooperate.</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-[#D32F2F] mr-2 flex-shrink-0">•</span>
-                <span className="text-[#D4AF37]">The photographer shall not be held responsible for any data loss after six (6) months.</span>
-              </li>
-            </ul>
-          </div>
-        </motion.div>
       </div>
     </div>
   );
