@@ -68,8 +68,8 @@ const About = () => {
       name: 'Rudra Pratap Sen',
       specialty: 'Portrait Photographer',
       description: 'Specialists in capturing genuine, heartfelt moments',
-      image: '',
-      imgPos: 'center'
+      image: 'https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/h0zf95bh_IMG_4359.JPG.jpeg',
+      imgPos: 'center 25%'
     },
     {
       name: 'Abhirup Roy',
