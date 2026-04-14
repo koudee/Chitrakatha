@@ -31,10 +31,14 @@ Build a responsive website with a dashboard page, Gallery page, Service page, an
 6. **Admin Dashboard** (`/admin/dashboard`): Image management, gallery CRUD, reordering
 
 ## Team Members (About Page)
+### Row 1
 1. Upasak Mukherjee - Cinematographer & Photographer
 2. Deep Shekhar Ojha - Candid & Wide Photographer
 3. Debraj Roy - Candid & Portrait Photographer
 4. Sandip Pal - Cinematographer
+### Row 2 (centered, photos pending)
+5. Rudra Pratap Sen - Portrait Photographer
+6. Abhirup Roy - Wide & Candid Photographer
 
 ## API Endpoints
 - `POST /api/auth/login` - User login

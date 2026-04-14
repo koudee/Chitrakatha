@@ -32,7 +32,7 @@ const About = () => {
     { icon: Award, label: 'Years of Experience', value: '6+' }
   ];
 
-  const team = [
+  const teamRow1 = [
     {
       name: 'Upasak Mukherjee',
       specialty: 'Cinematographer & Photographer',
@@ -56,6 +56,21 @@ const About = () => {
       specialty: 'Cinematographer',
       description: 'Creating cinematic stories with cutting-edge equipment',
       image: 'https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/bg63o1bb_IMG_4002.JPG.jpeg'
+    }
+  ];
+
+  const teamRow2 = [
+    {
+      name: 'Rudra Pratap Sen',
+      specialty: 'Portrait Photographer',
+      description: 'Specialists in capturing genuine, heartfelt moments',
+      image: ''
+    },
+    {
+      name: 'Abhirup Roy',
+      specialty: 'Wide & Candid Photographer',
+      description: 'Specialists in capturing genuine, authentic moments',
+      image: ''
     }
   ];
 
@@ -161,7 +176,7 @@ const About = () => {
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {team.map((member, idx) => (
+            {teamRow1.map((member, idx) => (
               <motion.div
                 key={idx}
                 initial={{ opacity: 0, y: 30 }}
@@ -176,11 +191,49 @@ const About = () => {
                     <img
                       src={member.image}
                       alt={member.name}
-                      className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+                      className="w-full h-full object-cover object-top transition-transform duration-700 hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#121212] via-transparent to-transparent" />
                   </div>
                 )}
+                <div className="p-6">
+                  <h3 className="font-heading text-xl font-bold mb-2">{member.name}</h3>
+                  <p className="text-[#D32F2F] text-sm mb-3 uppercase tracking-widest">{member.specialty}</p>
+                  <p className="text-sm text-[#A3A3A3] leading-relaxed">{member.description}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Second Row - Centered */}
+          <div className="flex flex-col md:flex-row justify-center gap-8 mt-8">
+            {teamRow2.map((member, idx) => (
+              <motion.div
+                key={idx + 4}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: idx * 0.2 }}
+                viewport={{ once: true }}
+                className="bg-[#121212] border border-white/5 rounded-xl overflow-hidden hover:border-[#D4AF37]/30 transition-all duration-300 w-full md:w-[calc(25%-1rem)]"
+                data-testid={`team-member-${idx + 4}`}
+              >
+                <div className="relative h-80 overflow-hidden bg-[#1A1A1A] flex items-center justify-center">
+                  {member.image ? (
+                    <>
+                      <img
+                        src={member.image}
+                        alt={member.name}
+                        className="w-full h-full object-cover object-top transition-transform duration-700 hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#121212] via-transparent to-transparent" />
+                    </>
+                  ) : (
+                    <div className="text-[#A3A3A3]/30 flex flex-col items-center gap-3">
+                      <Camera size={48} />
+                      <span className="text-xs uppercase tracking-widest">Photo Coming Soon</span>
+                    </div>
+                  )}
+                </div>
                 <div className="p-6">
                   <h3 className="font-heading text-xl font-bold mb-2">{member.name}</h3>
                   <p className="text-[#D32F2F] text-sm mb-3 uppercase tracking-widest">{member.specialty}</p>
