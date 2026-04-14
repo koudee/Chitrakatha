@@ -13,6 +13,7 @@ const Services = () => {
   const [selectedAddOns, setSelectedAddOns] = useState([]);
   const [showContactModal, setShowContactModal] = useState(false);
   const [serviceImages, setServiceImages] = useState([]);
+  const [kidsImages, setKidsImages] = useState([]);
 
   useEffect(() => {
     fetchServiceImages();
@@ -23,6 +24,8 @@ const Services = () => {
       const response = await axios.get(`${API}/site-images`);
       const images = response.data.filter(img => img.section === 'services').sort((a, b) => a.order - b.order);
       setServiceImages(images);
+      const kids = response.data.filter(img => img.section === 'kids').sort((a, b) => a.order - b.order);
+      setKidsImages(kids);
     } catch (error) {
       console.error('Error fetching service images:', error);
     }
@@ -317,13 +320,17 @@ const Services = () => {
               >
                 {/* Image Section - Larger */}
                 <div className="relative h-72 overflow-hidden">
-                  {serviceImages[pkg.imageIndex || idx] && (
-                    <img
-                      src={serviceImages[pkg.imageIndex || idx]?.image_url}
-                      alt={pkg.name}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
-                  )}
+                  {(() => {
+                    const imgs = activeCategory === 'kids' ? kidsImages : serviceImages;
+                    const img = imgs[pkg.imageIndex !== undefined ? pkg.imageIndex : idx];
+                    return img ? (
+                      <img
+                        src={img.image_url}
+                        alt={pkg.name}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      />
+                    ) : null;
+                  })()}
                   <div className="absolute inset-0 bg-gradient-to-t from-[#121212] via-transparent to-transparent" />
                   
                   {/* Badges */}
