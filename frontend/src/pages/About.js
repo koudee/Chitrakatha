@@ -84,7 +84,7 @@ const About = () => {
           className="text-center mb-16"
         >
           <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold mb-4" data-testid="about-title">
-            About <span className="text-[#D4AF37]">Chitrakatha</span>
+            About <span className="text-[#D4AF37]">Us</span>
           </h1>
           <p className="text-lg text-[#A3A3A3] max-w-3xl mx-auto">
             Preserving the moments that matter most through real moments and raw emotion
@@ -181,9 +181,10 @@ const About = () => {
                 key={idx}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
+                whileHover={{ y: -10, transition: { duration: 0.35, ease: 'easeOut' } }}
                 transition={{ duration: 0.6, delay: idx * 0.2 }}
                 viewport={{ once: true }}
-                className="bg-[#121212] border border-white/5 rounded-xl overflow-hidden hover:border-[#D4AF37]/30 transition-all duration-300"
+                className="group bg-[#121212] border border-white/5 rounded-xl overflow-hidden hover:border-[#D4AF37]/50 hover:shadow-xl hover:shadow-[#D4AF37]/10 transition-all duration-500 cursor-pointer"
                 data-testid={`team-member-${idx}`}
               >
                 {member.image && (
@@ -191,13 +192,13 @@ const About = () => {
                     <img
                       src={member.image}
                       alt={member.name}
-                      className="w-full h-full object-cover object-top transition-transform duration-700 hover:scale-105"
+                      className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-110"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#121212] via-transparent to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#121212] via-transparent to-transparent group-hover:from-[#121212]/90 transition-all duration-500" />
                   </div>
                 )}
-                <div className="p-6">
-                  <h3 className="font-heading text-xl font-bold mb-2">{member.name}</h3>
+                <div className="p-6 transition-transform duration-300 group-hover:translate-y-[-4px]">
+                  <h3 className="font-heading text-xl font-bold mb-2 group-hover:text-[#D4AF37] transition-colors duration-300">{member.name}</h3>
                   <p className="text-[#D32F2F] text-sm mb-3 uppercase tracking-widest">{member.specialty}</p>
                   <p className="text-sm text-[#A3A3A3] leading-relaxed">{member.description}</p>
                 </div>
@@ -212,9 +213,10 @@ const About = () => {
                 key={idx + 4}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
+                whileHover={{ y: -10, transition: { duration: 0.35, ease: 'easeOut' } }}
                 transition={{ duration: 0.6, delay: idx * 0.2 }}
                 viewport={{ once: true }}
-                className="bg-[#121212] border border-white/5 rounded-xl overflow-hidden hover:border-[#D4AF37]/30 transition-all duration-300 w-full md:w-[calc(25%-1rem)]"
+                className="group bg-[#121212] border border-white/5 rounded-xl overflow-hidden hover:border-[#D4AF37]/50 hover:shadow-xl hover:shadow-[#D4AF37]/10 transition-all duration-500 w-full md:w-[calc(25%-1rem)] cursor-pointer"
                 data-testid={`team-member-${idx + 4}`}
               >
                 <div className="relative h-80 overflow-hidden bg-[#1A1A1A] flex items-center justify-center">
@@ -223,19 +225,19 @@ const About = () => {
                       <img
                         src={member.image}
                         alt={member.name}
-                        className="w-full h-full object-cover object-top transition-transform duration-700 hover:scale-105"
+                        className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-110"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#121212] via-transparent to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#121212] via-transparent to-transparent group-hover:from-[#121212]/90 transition-all duration-500" />
                     </>
                   ) : (
-                    <div className="text-[#A3A3A3]/30 flex flex-col items-center gap-3">
+                    <div className="text-[#A3A3A3]/30 flex flex-col items-center gap-3 group-hover:text-[#D4AF37]/40 transition-colors duration-500">
                       <Camera size={48} />
                       <span className="text-xs uppercase tracking-widest">Photo Coming Soon</span>
                     </div>
                   )}
                 </div>
-                <div className="p-6">
-                  <h3 className="font-heading text-xl font-bold mb-2">{member.name}</h3>
+                <div className="p-6 transition-transform duration-300 group-hover:translate-y-[-4px]">
+                  <h3 className="font-heading text-xl font-bold mb-2 group-hover:text-[#D4AF37] transition-colors duration-300">{member.name}</h3>
                   <p className="text-[#D32F2F] text-sm mb-3 uppercase tracking-widest">{member.specialty}</p>
                   <p className="text-sm text-[#A3A3A3] leading-relaxed">{member.description}</p>
                 </div>

@@ -36,7 +36,7 @@ const Navbar = ({ isAuthenticated, onLogout }) => {
     { path: '/', label: 'Home' },
     { path: '/gallery', label: 'Gallery' },
     { path: '/services', label: 'Services' },
-    { path: '/about', label: 'About' },
+    { path: '/about', label: 'About Us' },
   ];
 
   return (
@@ -70,13 +70,13 @@ const Navbar = ({ isAuthenticated, onLogout }) => {
               <Link
                 key={link.path}
                 to={link.path}
-                data-testid={`nav-link-${link.label.toLowerCase()}`}
+                data-testid={`nav-link-${link.label.toLowerCase().replace(' ', '-')}`}
                 className="relative group px-6 py-3"
               >
-                <span className={`text-sm font-medium uppercase tracking-[0.2em] transition-colors duration-300 ${
+                <span className={`text-sm font-medium uppercase tracking-[0.2em] transition-all duration-300 ${
                   isActive(link.path)
                     ? 'text-[#D32F2F]'
-                    : 'text-white/90 group-hover:text-white'
+                    : 'text-white/90 group-hover:text-white group-hover:drop-shadow-[0_0_8px_rgba(212,175,55,0.4)]'
                 }`}>
                   {link.label}
                 </span>

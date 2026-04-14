@@ -27,6 +27,8 @@ const AdminDashboard = ({ onLogout }) => {
   const [loading, setLoading] = useState(true);
   const [previewImage, setPreviewImage] = useState(null);
   const [uploadingFile, setUploadingFile] = useState(false);
+  const [batchUploading, setBatchUploading] = useState(false);
+  const [batchProgress, setBatchProgress] = useState({ current: 0, total: 0 });
   
   const [newImage, setNewImage] = useState({
     title: '',
@@ -94,6 +96,50 @@ const AdminDashboard = ({ onLogout }) => {
       console.error(error);
     } finally {
       setUploadingFile(false);
+    }
+  };
+
+  const handleBatchUpload = async (files, category) => {
+    if (!files || files.length === 0) return;
+    
+    setBatchUploading(true);
+    setBatchProgress({ current: 0, total: files.length });
+    const token = localStorage.getItem('adminToken');
+    const headers = { Authorization: `Bearer ${token}` };
+    let successCount = 0;
+
+    for (let i = 0; i < files.length; i++) {
+      setBatchProgress({ current: i + 1, total: files.length });
+      try {
+        const formData = new FormData();
+        formData.append('file', files[i]);
+
+        const uploadRes = await axios.post(`${API}/admin/upload-image`, formData, {
+          headers: { ...headers, 'Content-Type': 'multipart/form-data' }
+        });
+
+        const fileName = files[i].name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+        await axios.post(`${API}/admin/gallery`, {
+          title: fileName,
+          category: category,
+          media_url: uploadRes.data.image_url,
+          media_type: 'photo',
+          order: galleryItems.length + i
+        }, { headers });
+
+        successCount++;
+      } catch (error) {
+        console.error(`Failed to upload ${files[i].name}:`, error);
+        toast.error(`Failed: ${files[i].name}`);
+      }
+    }
+
+    setBatchUploading(false);
+    setBatchProgress({ current: 0, total: 0 });
+    
+    if (successCount > 0) {
+      toast.success(`${successCount} of ${files.length} images uploaded to ${category}`);
+      fetchData();
     }
   };
 
@@ -390,6 +436,67 @@ const AdminDashboard = ({ onLogout }) => {
                       <span>Add Image</span>
                     </button>
                   </form>
+                </div>
+
+                {/* Batch Upload Section */}
+                <div className="bg-[#121212] border border-[#D4AF37]/20 p-6 rounded-xl mb-8">
+                  <h2 className="font-heading text-2xl font-bold mb-2 flex items-center space-x-2">
+                    <Upload size={24} className="text-[#D4AF37]" />
+                    <span>Batch Upload Multiple Images</span>
+                  </h2>
+                  <p className="text-sm text-[#A3A3A3] mb-4">Select multiple images at once and upload them to a category</p>
+                  
+                  <div className="grid md:grid-cols-2 gap-4 items-end">
+                    <div>
+                      <label className="block text-sm font-medium text-[#E5E5E5] mb-2">Category</label>
+                      <select
+                        id="batch-category"
+                        defaultValue="Wedding"
+                        className="w-full bg-[#1A1A1A] border border-white/10 text-white px-4 py-3 rounded-lg"
+                        data-testid="batch-category-select"
+                      >
+                        <option>Wedding</option>
+                        <option>Pre-Wedding</option>
+                        <option>Portrait</option>
+                        <option>Kids</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[#E5E5E5] mb-2">Select Images</label>
+                      <label>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          onChange={(e) => {
+                            if (e.target.files && e.target.files.length > 0) {
+                              const category = document.getElementById('batch-category').value;
+                              handleBatchUpload(Array.from(e.target.files), category);
+                              e.target.value = '';
+                            }
+                          }}
+                          className="hidden"
+                          data-testid="batch-upload-input"
+                        />
+                        <div className="w-full btn-outline-gold text-center py-3 cursor-pointer flex items-center justify-center space-x-2">
+                          <Upload size={18} />
+                          <span>{batchUploading ? `Uploading ${batchProgress.current}/${batchProgress.total}...` : 'Choose Multiple Images'}</span>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+
+                  {batchUploading && (
+                    <div className="mt-4">
+                      <div className="w-full bg-[#1A1A1A] rounded-full h-3 overflow-hidden">
+                        <div 
+                          className="h-full bg-gradient-to-r from-[#D32F2F] to-[#D4AF37] transition-all duration-300 rounded-full"
+                          style={{ width: `${(batchProgress.current / batchProgress.total) * 100}%` }}
+                        />
+                      </div>
+                      <p className="text-sm text-[#D4AF37] mt-2">{batchProgress.current} of {batchProgress.total} images uploaded</p>
+                    </div>
+                  )}
                 </div>
 
                 <div className="mb-4 flex items-center space-x-2 text-[#D4AF37]">
