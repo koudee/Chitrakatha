@@ -16,11 +16,13 @@ Build a responsive website with a dashboard page, Gallery page, Service page, an
 - Dynamic Hero slideshow with smooth transitions (Home page)
 - Complete Services page with Pre-Wedding, Wedding, Kids sections, interactive summation features, and "Book Now" modal
 - Gallery page with filtered categories (Wedding, Pre-Wedding, Portrait, Kids)
-- About Us page with Our Story, Stats, Meet Our Team (4 members in single row), Philosophy
+- About Us page with Our Story, Stats, Meet Our Team (6 members in 2 rows), Philosophy
 - UI/UX: Custom auto-hiding navbar, Cinematic Noir dark theme
 - Rounded corners (rounded-xl/rounded-lg) on all cards/boxes across the site
 - Hover animations on all interactive cards
 - Team member images with `object-top` for face visibility
+- Rich cinematic background effects on Home page sections (radial glows, gradient overlays, separator lines)
+- **Custom button animation system**: All buttons redesigned with gradient backgrounds, shimmer sweep, glow pulse, fill-sweep, underline-sweep, and press-down click effects (btn-primary-red, btn-outline-gold, btn-book-red/gold, btn-filter, btn-category, btn-text-link)
 
 ## Key Pages
 1. **Home** (`/`): Hero slideshow, featured work, packages preview, CTA
