@@ -278,10 +278,10 @@ const Services = () => {
                 <button
                   key={cat.id}
                   onClick={() => setActiveCategory(cat.id)}
-                  className={`flex items-center space-x-3 px-8 py-4 rounded-xl font-medium transition-all duration-300 ${
+                  className={`btn-category flex items-center space-x-3 ${
                     activeCategory === cat.id
-                      ? 'bg-[#D32F2F] text-white shadow-lg shadow-[#D32F2F]/30 scale-105'
-                      : 'bg-[#121212] text-[#A3A3A3] hover:text-white hover:bg-[#1A1A1A] border border-white/5'
+                      ? 'btn-category-active'
+                      : 'btn-category-inactive'
                   }`}
                 >
                   <Icon size={24} />
@@ -384,10 +384,10 @@ const Services = () => {
 
                   <button
                     onClick={() => handleBookPackage(pkg)}
-                    className={`w-full py-4 rounded-xl font-semibold text-lg transition-all duration-300 ${
+                    className={`w-full ${
                       pkg.highlight
-                        ? 'bg-[#D4AF37] text-black hover:bg-[#C5A028] shadow-lg shadow-[#D4AF37]/30'
-                        : 'bg-[#D32F2F] text-white hover:bg-[#B71C1C] shadow-lg shadow-[#D32F2F]/30'
+                        ? 'btn-book-gold'
+                        : 'btn-book-red'
                     }`}
                   >
                     Book Now

@@ -35,3 +35,291 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* ===== BUTTON ANIMATION SYSTEM ===== */
+
+/* Shimmer sweep overlay for primary buttons */
+@keyframes shimmer-sweep {
+  0% { transform: translateX(-100%) skewX(-15deg); }
+  100% { transform: translateX(200%) skewX(-15deg); }
+}
+
+/* Glow pulse for emphasis */
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 15px rgba(212, 47, 47, 0.3), 0 0 30px rgba(212, 47, 47, 0.1); }
+  50% { box-shadow: 0 0 25px rgba(212, 47, 47, 0.5), 0 0 50px rgba(212, 47, 47, 0.2); }
+}
+
+@keyframes glow-pulse-gold {
+  0%, 100% { box-shadow: 0 0 15px rgba(212, 175, 55, 0.3), 0 0 30px rgba(212, 175, 55, 0.1); }
+  50% { box-shadow: 0 0 25px rgba(212, 175, 55, 0.5), 0 0 50px rgba(212, 175, 55, 0.2); }
+}
+
+/* Border glow animation */
+@keyframes border-glow {
+  0%, 100% { border-color: rgba(212, 175, 55, 0.4); }
+  50% { border-color: rgba(212, 175, 55, 0.9); }
+}
+
+/* === Primary Red Button === */
+.btn-primary-red {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #D32F2F 0%, #B71C1C 100%);
+  color: white;
+  border-radius: 0.75rem;
+  padding: 0.75rem 2rem;
+  font-weight: 600;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  box-shadow: 0 4px 15px rgba(211, 47, 47, 0.25);
+}
+.btn-primary-red::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+  transform: translateX(-100%) skewX(-15deg);
+  transition: none;
+}
+.btn-primary-red:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 8px 30px rgba(211, 47, 47, 0.4), 0 0 20px rgba(211, 47, 47, 0.2);
+  background: linear-gradient(135deg, #E53935 0%, #C62828 100%);
+}
+.btn-primary-red:hover::before {
+  animation: shimmer-sweep 0.8s ease-in-out;
+}
+.btn-primary-red:active {
+  transform: translateY(1px) scale(0.97);
+  box-shadow: 0 2px 8px rgba(211, 47, 47, 0.3);
+  transition: all 0.1s ease;
+}
+
+/* === Gold Outline Button === */
+.btn-outline-gold {
+  position: relative;
+  overflow: hidden;
+  background: transparent;
+  color: #D4AF37;
+  border: 1.5px solid #D4AF37;
+  border-radius: 0.75rem;
+  padding: 0.75rem 2rem;
+  font-weight: 600;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  z-index: 1;
+}
+.btn-outline-gold::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 0;
+  height: 100%;
+  background: linear-gradient(135deg, #D4AF37 0%, #C5A028 100%);
+  transition: width 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  z-index: -1;
+}
+.btn-outline-gold:hover {
+  color: #000;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3), 0 0 15px rgba(212, 175, 55, 0.15);
+  border-color: #D4AF37;
+}
+.btn-outline-gold:hover::before {
+  width: 100%;
+}
+.btn-outline-gold:active {
+  transform: translateY(1px) scale(0.97);
+  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.25);
+  transition: all 0.1s ease;
+}
+
+/* === Book Now Button (Red variant) === */
+.btn-book-red {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #D32F2F 0%, #C62828 50%, #D32F2F 100%);
+  background-size: 200% 100%;
+  color: white;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  font-weight: 700;
+  font-size: 1.125rem;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  box-shadow: 0 4px 20px rgba(211, 47, 47, 0.25);
+}
+.btn-book-red::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 0; height: 0;
+  background: rgba(255,255,255,0.15);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+}
+.btn-book-red:hover {
+  background-position: 100% 0;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 35px rgba(211, 47, 47, 0.45);
+  animation: glow-pulse 2s infinite;
+}
+.btn-book-red:active {
+  transform: translateY(1px) scale(0.97);
+  box-shadow: 0 2px 10px rgba(211, 47, 47, 0.3);
+  transition: all 0.1s ease;
+}
+.btn-book-red:active::after {
+  width: 300px; height: 300px;
+  transition: width 0.3s ease, height 0.3s ease;
+}
+
+/* === Book Now Button (Gold variant) === */
+.btn-book-gold {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #D4AF37 0%, #C5A028 50%, #D4AF37 100%);
+  background-size: 200% 100%;
+  color: #000;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  font-weight: 700;
+  font-size: 1.125rem;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  box-shadow: 0 4px 20px rgba(212, 175, 55, 0.25);
+}
+.btn-book-gold::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 0; height: 0;
+  background: rgba(255,255,255,0.2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+}
+.btn-book-gold:hover {
+  background-position: 100% 0;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 35px rgba(212, 175, 55, 0.45);
+  animation: glow-pulse-gold 2s infinite;
+}
+.btn-book-gold:active {
+  transform: translateY(1px) scale(0.97);
+  box-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);
+  transition: all 0.1s ease;
+}
+.btn-book-gold:active::after {
+  width: 300px; height: 300px;
+  transition: width 0.3s ease, height 0.3s ease;
+}
+
+/* === Filter / Category Tab Button === */
+.btn-filter {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  padding: 0.5rem 1.5rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.875rem;
+  transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.btn-filter-inactive {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.15);
+  color: white;
+}
+.btn-filter-inactive:hover {
+  border-color: #D32F2F;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(211, 47, 47, 0.2);
+  background: rgba(211, 47, 47, 0.08);
+}
+.btn-filter-active {
+  background: linear-gradient(135deg, #D32F2F 0%, #B71C1C 100%);
+  color: white;
+  box-shadow: 0 4px 20px rgba(211, 47, 47, 0.35);
+  border: 1px solid transparent;
+}
+.btn-filter:active {
+  transform: translateY(1px) scale(0.96);
+  transition: all 0.1s ease;
+}
+
+/* === Category Tab (Services - larger) === */
+.btn-category {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  padding: 1rem 2rem;
+  font-weight: 500;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.btn-category-inactive {
+  background: #121212;
+  color: #A3A3A3;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+.btn-category-inactive::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 50%;
+  width: 0; height: 2px;
+  background: #D32F2F;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  transform: translateX(-50%);
+}
+.btn-category-inactive:hover {
+  color: white;
+  background: #1A1A1A;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+.btn-category-inactive:hover::before {
+  width: 60%;
+}
+.btn-category-active {
+  background: linear-gradient(135deg, #D32F2F 0%, #B71C1C 100%);
+  color: white;
+  box-shadow: 0 6px 25px rgba(211, 47, 47, 0.35);
+  transform: scale(1.05);
+  border: 1px solid transparent;
+}
+.btn-category:active {
+  transform: translateY(1px) scale(0.96);
+  transition: all 0.1s ease;
+}
+
+/* === Text Link Button (View Details) === */
+.btn-text-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #D32F2F;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.btn-text-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px; left: 0;
+  width: 0; height: 2px;
+  background: linear-gradient(90deg, #D32F2F, #D4AF37);
+  transition: width 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.btn-text-link:hover {
+  color: #E53935;
+  transform: translateX(4px);
+}
+.btn-text-link:hover::after {
+  width: 100%;
+}
+.btn-text-link:active {
+  transform: translateX(2px) scale(0.97);
+  transition: all 0.1s ease;
+}

@@ -112,15 +112,15 @@ const Home = () => {
             <Link
               to="/services"
               data-testid="cta-view-packages"
-              className="bg-[#D32F2F] text-white hover:bg-[#B71C1C] rounded-lg px-8 py-3 font-medium transition-all duration-300 flex items-center space-x-2 group"
+              className="btn-primary-red flex items-center space-x-2 group"
             >
               <span>View Our Packages</span>
-              <ArrowRight className="group-hover:translate-x-1 transition-transform" size={20} />
+              <ArrowRight className="group-hover:translate-x-1 transition-transform duration-300" size={20} />
             </Link>
             <Link
               to="/gallery"
               data-testid="cta-explore-gallery"
-              className="border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black rounded-lg px-8 py-3 font-medium transition-all duration-300 flex items-center space-x-2"
+              className="btn-outline-gold flex items-center space-x-2"
             >
               <Play size={20} />
               <span>Explore Gallery</span>
@@ -207,7 +207,7 @@ const Home = () => {
             <Link
               to="/gallery"
               data-testid="view-full-gallery-button"
-              className="inline-flex items-center space-x-2 border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black rounded-lg px-8 py-3 font-medium transition-all duration-300"
+              className="btn-outline-gold inline-flex items-center space-x-2"
             >
               <span>View Full Gallery</span>
               <ArrowRight size={20} />
@@ -283,10 +283,10 @@ const Home = () => {
                   <p className="text-sm text-[#A3A3A3] mb-4">Perfect for your special day</p>
                   <Link
                     to="/services"
-                    className="inline-flex items-center space-x-2 text-[#D32F2F] hover:text-[#B71C1C] font-medium transition-colors group"
+                    className="btn-text-link group"
                   >
                     <span>View Details</span>
-                    <ArrowRight className="group-hover:translate-x-1 transition-transform" size={18} />
+                    <ArrowRight className="group-hover:translate-x-1 transition-transform duration-300" size={18} />
                   </Link>
                 </div>
               </motion.div>
@@ -297,7 +297,7 @@ const Home = () => {
             <Link
               to="/services"
               data-testid="view-all-packages-button"
-              className="inline-flex items-center space-x-2 bg-[#D32F2F] text-white hover:bg-[#B71C1C] rounded-lg px-8 py-3 font-medium transition-all duration-300"
+              className="btn-primary-red inline-flex items-center space-x-2"
             >
               <span>View All Packages</span>
               <ArrowRight size={20} />
