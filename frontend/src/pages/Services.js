@@ -14,6 +14,7 @@ const Services = () => {
   const [showContactModal, setShowContactModal] = useState(false);
   const [serviceImages, setServiceImages] = useState([]);
   const [kidsImages, setKidsImages] = useState([]);
+  const [preweddingImages, setPreweddingImages] = useState([]);
 
   useEffect(() => {
     fetchServiceImages();
@@ -26,6 +27,8 @@ const Services = () => {
       setServiceImages(images);
       const kids = response.data.filter(img => img.section === 'kids').sort((a, b) => a.order - b.order);
       setKidsImages(kids);
+      const prewedding = response.data.filter(img => img.section === 'prewedding').sort((a, b) => a.order - b.order);
+      setPreweddingImages(prewedding);
     } catch (error) {
       console.error('Error fetching service images:', error);
     }
@@ -321,7 +324,7 @@ const Services = () => {
                 {/* Image Section - Larger */}
                 <div className="relative h-72 overflow-hidden">
                   {(() => {
-                    const imgs = activeCategory === 'kids' ? kidsImages : serviceImages;
+                    const imgs = activeCategory === 'kids' ? kidsImages : activeCategory === 'prewedding' ? preweddingImages : serviceImages;
                     const img = imgs[pkg.imageIndex !== undefined ? pkg.imageIndex : idx];
                     return img ? (
                       <img
