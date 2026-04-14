@@ -146,8 +146,18 @@ const Home = () => {
       </section>
 
       {/* Featured Work Preview */}
-      <section className="py-20 md:py-32 px-4 md:px-8 bg-[#121212]">
-        <div className="container mx-auto">
+      <section className="py-20 md:py-32 px-4 md:px-8 relative overflow-hidden" style={{background: 'linear-gradient(135deg, #1a0a0a 0%, #121212 40%, #0d0d0d 60%, #12100a 100%)'}}>
+        {/* Decorative background elements */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 left-0 w-[600px] h-[600px] bg-[#D32F2F]/8 rounded-full blur-[150px] -translate-x-1/4 -translate-y-1/4" />
+          <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-[#D4AF37]/8 rounded-full blur-[130px] translate-x-1/4 translate-y-1/4" />
+          <div className="absolute top-1/2 left-1/2 w-[300px] h-[300px] bg-[#D32F2F]/5 rounded-full blur-[100px] -translate-x-1/2 -translate-y-1/2" />
+        </div>
+        {/* Top border glow */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#D32F2F]/30 to-transparent" />
+        {/* Bottom border glow */}
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#D4AF37]/20 to-transparent" />
+        <div className="container mx-auto relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -207,8 +217,16 @@ const Home = () => {
       </section>
 
       {/* Packages Preview */}
-      <section className="py-20 md:py-32 px-4 md:px-8">
-        <div className="container mx-auto">
+      <section className="py-20 md:py-32 px-4 md:px-8 relative overflow-hidden" style={{background: 'linear-gradient(160deg, #0d0d0d 0%, #100d08 30%, #121212 50%, #0a0a10 80%, #0d0d0d 100%)'}}>
+        {/* Decorative background elements */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 right-0 w-[550px] h-[550px] bg-[#D4AF37]/8 rounded-full blur-[140px] translate-x-1/4 -translate-y-1/4" />
+          <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-[#D32F2F]/6 rounded-full blur-[150px] -translate-x-1/4 translate-y-1/4" />
+          <div className="absolute top-1/2 left-1/3 w-[250px] h-[250px] bg-[#D4AF37]/4 rounded-full blur-[90px]" />
+        </div>
+        {/* Top border glow */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#D4AF37]/30 to-transparent" />
+        <div className="container mx-auto relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
