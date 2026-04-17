@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react";
-import "@/App.css";
+import "./App.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { Toaster } from "@/components/ui/sonner";
-import Navbar from "@/components/Navbar";
-import Home from "@/pages/Home";
-import Gallery from "@/pages/Gallery";
-import Services from "@/pages/Services";
-import About from "@/pages/About";
-import Dashboard from "@/pages/Dashboard";
-import Login from "@/pages/Login";
-import AdminLogin from "@/pages/AdminLogin";
-import AdminDashboard from "@/pages/AdminDashboard";
+import { Toaster } from "./components/ui/sonner";
+import Navbar from "./components/Navbar";
+import Home from "./pages/Home";
+import Gallery from "./pages/Gallery";
+import Services from "./pages/Services";
+import About from "./pages/About";
+import Dashboard from "./pages/Dashboard";
+import Login from "./pages/Login";
+import AdminLogin from "./pages/AdminLogin";
+import AdminDashboard from "./pages/AdminDashboard";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
