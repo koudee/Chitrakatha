@@ -595,7 +595,7 @@ const Services = () => {
 
                 <div className="space-y-4 mb-6">
                   <a 
-                    href="tel:+919800000000"
+                    href="tel:+918250629065"
                     className="flex items-center space-x-4 bg-[#1A1A1A] border border-white/10 hover:border-[#D32F2F] rounded-xl p-4 transition-all duration-300 group"
                   >
                     <div className="bg-[#D32F2F] p-3 rounded-xl group-hover:bg-[#B71C1C] transition-colors">
@@ -603,12 +603,12 @@ const Services = () => {
                     </div>
                     <div>
                       <p className="text-sm text-[#A3A3A3]">Call Us</p>
-                      <p className="text-lg font-semibold text-white">+91 98000 00000</p>
+                      <p className="text-lg font-semibold text-white">+91 82506 29065</p>
                     </div>
                   </a>
 
                   <a 
-                    href="https://wa.me/919800000000"
+                    href="https://wa.me/918250629065"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center space-x-4 bg-[#1A1A1A] border border-white/10 hover:border-[#25D366] rounded-xl p-4 transition-all duration-300 group"
@@ -623,7 +623,7 @@ const Services = () => {
                   </a>
 
                   <a 
-                    href="mailto:contact@chitrakatha.com"
+                    href="mailto:chitrakathaasansol@gmail.com"
                     className="flex items-center space-x-4 bg-[#1A1A1A] border border-white/10 hover:border-[#D4AF37] rounded-xl p-4 transition-all duration-300 group"
                   >
                     <div className="bg-[#D4AF37] p-3 rounded-xl group-hover:bg-[#C5A028] transition-colors">
@@ -631,7 +631,7 @@ const Services = () => {
                     </div>
                     <div>
                       <p className="text-sm text-[#A3A3A3]">Email</p>
-                      <p className="text-lg font-semibold text-white">contact@chitrakatha.com</p>
+                      <p className="text-lg font-semibold text-white">chitrakathaasansol@gmail.com</p>
                     </div>
                   </a>
                 </div>
