@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, Plus, Tag, X, Phone, Mail, MessageCircle, CheckCircle, Heart, Baby, Camera } from 'lucide-react';
+import { Check, Plus, Tag, X, Phone, Mail, Instagram, CheckCircle, Heart, Baby, Camera } from 'lucide-react';
 import { toast } from 'sonner';
 import axios from 'axios';
 
@@ -608,17 +608,17 @@ const Services = () => {
                   </a>
 
                   <a 
-                    href="https://wa.me/918250629065"
+                    href="https://www.instagram.com/chitrakatha_studios?igsh=am1rdTZlY3dkZjh5"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center space-x-4 bg-[#1A1A1A] border border-white/10 hover:border-[#25D366] rounded-xl p-4 transition-all duration-300 group"
+                    className="flex items-center space-x-4 bg-[#1A1A1A] border border-white/10 hover:border-[#E1306C] rounded-xl p-4 transition-all duration-300 group"
                   >
-                    <div className="bg-[#25D366] p-3 rounded-xl group-hover:bg-[#1FA855] transition-colors">
-                      <MessageCircle size={24} className="text-white" />
+                    <div className="bg-gradient-to-br from-[#F58529] via-[#DD2A7B] to-[#8134AF] p-3 rounded-xl group-hover:opacity-90 transition-opacity">
+                      <Instagram size={24} className="text-white" />
                     </div>
                     <div>
-                      <p className="text-sm text-[#A3A3A3]">WhatsApp</p>
-                      <p className="text-lg font-semibold text-white">Chat with us</p>
+                      <p className="text-sm text-[#A3A3A3]">Instagram</p>
+                      <p className="text-lg font-semibold text-white">@chitrakatha_studios</p>
                     </div>
                   </a>
 
