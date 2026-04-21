@@ -600,6 +600,44 @@ async def startup_event():
                 image_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/zf1vnqdd_WhatsApp%20Image%202026-02-20%20at%2012.04.57%20AM.jpeg",
                 alt_text="Our team capturing moments",
                 order=0
+            ),
+            # Kids section (Services page)
+            SiteImage(
+                section="kids",
+                image_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/wu9b1ly7_DRP_0946.jpg.jpeg",
+                alt_text="Mother and Baby Ceremony",
+                order=0
+            ),
+            SiteImage(
+                section="kids",
+                image_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/f0zbn1yr_DRP_1006.jpg.jpeg",
+                alt_text="Baby Rose Petal Bath",
+                order=1
+            ),
+            SiteImage(
+                section="kids",
+                image_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/8rm8dvz0_DRP_5337.jpg.jpeg",
+                alt_text="Little Boy with Toys",
+                order=2
+            ),
+            SiteImage(
+                section="kids",
+                image_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/a6lri316_UPM_4147.jpg.jpeg",
+                alt_text="Baby Annaprashan Ceremony",
+                order=3
+            ),
+            # Pre-Wedding section (Services page)
+            SiteImage(
+                section="prewedding",
+                image_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/bzneuylg_post%20%281%29.jpg.jpeg",
+                alt_text="Couple in Open Fields",
+                order=0
+            ),
+            SiteImage(
+                section="prewedding",
+                image_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/1k7g86l1_DRP_9522-Enhanced-NR.jpg.jpeg",
+                alt_text="Golden Hour Romance",
+                order=1
             )
         ]
         
@@ -705,6 +743,120 @@ async def startup_event():
                 media_type="photo",
                 media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/dzf4ww5n_DRP_0484.jpg.jpeg",
                 order=12
+            ),
+            # Kids gallery items
+            GalleryItem(
+                title="Mother and Baby Ceremony",
+                category="Kids",
+                media_type="photo",
+                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/wu9b1ly7_DRP_0946.jpg.jpeg",
+                order=13
+            ),
+            GalleryItem(
+                title="Baby Rose Petal Bath",
+                category="Kids",
+                media_type="photo",
+                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/f0zbn1yr_DRP_1006.jpg.jpeg",
+                order=14
+            ),
+            GalleryItem(
+                title="Little Boy with Toys",
+                category="Kids",
+                media_type="photo",
+                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/8rm8dvz0_DRP_5337.jpg.jpeg",
+                order=15
+            ),
+            GalleryItem(
+                title="Baby Annaprashan Ceremony",
+                category="Kids",
+                media_type="photo",
+                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/a6lri316_UPM_4147.jpg.jpeg",
+                order=16
+            ),
+            GalleryItem(
+                title="Baby in Pink",
+                category="Kids",
+                media_type="photo",
+                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/1mfg1df0_DRP_1065.jpg.jpeg",
+                order=17
+            ),
+            GalleryItem(
+                title="Baby Annaprashan Ritual",
+                category="Kids",
+                media_type="photo",
+                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/wszedk5g_DRP_3123.jpg.jpeg",
+                order=18
+            ),
+            GalleryItem(
+                title="Curious Baby Portrait",
+                category="Kids",
+                media_type="photo",
+                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/oveslxoh_DRP_5269.jpg.jpeg",
+                order=19
+            ),
+            GalleryItem(
+                title="Baby Splash Fun",
+                category="Kids",
+                media_type="photo",
+                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/bq0u3bfz_DRP_6486.jpg.jpeg",
+                order=20
+            ),
+            GalleryItem(
+                title="Adorable Baby Close-up",
+                category="Kids",
+                media_type="photo",
+                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/92yk7txo_fgh.jpg.jpeg",
+                order=21
+            ),
+            # Pre-Wedding gallery items
+            GalleryItem(
+                title="Couple in Open Fields",
+                category="Pre-Wedding",
+                media_type="photo",
+                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/bzneuylg_post%20%281%29.jpg.jpeg",
+                order=22
+            ),
+            GalleryItem(
+                title="Golden Hour Romance",
+                category="Pre-Wedding",
+                media_type="photo",
+                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/1k7g86l1_DRP_9522-Enhanced-NR.jpg.jpeg",
+                order=23
+            ),
+            GalleryItem(
+                title="Couple Under the Banyan Tree",
+                category="Pre-Wedding",
+                media_type="photo",
+                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/1zg9zgrg_DSC_2514.jpg.jpeg",
+                order=24
+            ),
+            GalleryItem(
+                title="Lakeside Romance",
+                category="Pre-Wedding",
+                media_type="photo",
+                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/oio9sal3_DSC_2793.jpg.jpeg",
+                order=25
+            ),
+            GalleryItem(
+                title="Forest Love Story",
+                category="Pre-Wedding",
+                media_type="photo",
+                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/u2rj0fjz_DSC_2958.jpg.jpeg",
+                order=26
+            ),
+            GalleryItem(
+                title="Beach Walk Together",
+                category="Pre-Wedding",
+                media_type="photo",
+                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/9rw9oors_DSC_2991.jpg.jpeg",
+                order=27
+            ),
+            GalleryItem(
+                title="Couple at the Temple",
+                category="Pre-Wedding",
+                media_type="photo",
+                media_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/nobaqly0_SND04815.jpg.jpeg",
+                order=28
             )
         ]
         
