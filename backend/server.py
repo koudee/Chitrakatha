@@ -584,13 +584,13 @@ async def startup_event():
             ),
             SiteImage(
                 section="services",
-                image_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/520ttye7_WhatsApp%20Image%202026-02-20%20at%2012.04.55%20AM%20%281%29.jpeg",
+                image_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/nh2pa7kk_WhatsApp%20Image%202026-02-20%20at%2012.04.56%20AM.jpeg",
                 alt_text="Cinematic package",
                 order=2
             ),
             SiteImage(
                 section="services",
-                image_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/u1naa4w7_WhatsApp%20Image%202026-02-20%20at%2012.04.55%20AM%20%282%29.jpeg",
+                image_url="https://customer-assets.emergentagent.com/job_multi-page-site-4/artifacts/urv23ghf_DRP_0562.jpg.jpeg",
                 alt_text="Premium package",
                 order=3
             ),
