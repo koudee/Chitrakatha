@@ -600,7 +600,7 @@ const AdminDashboard = ({ onLogout }) => {
                                 <div {...provided.dragHandleProps} className="cursor-grab active:cursor-grabbing">
                                   <div className="relative h-48">
                                     <img
-                                      src={item.media_url}
+                                      src={item.media_url?.startsWith('http') ? item.media_url : `${BACKEND_URL}${item.media_url}`}
                                       alt={item.title}
                                       className="w-full h-full object-cover"
                                     />
@@ -673,7 +673,7 @@ const AdminDashboard = ({ onLogout }) => {
               onClick={(e) => e.stopPropagation()}
             >
               <img
-                src={previewImage}
+                src={previewImage?.startsWith('http') ? previewImage : `${BACKEND_URL}${previewImage}`}
                 alt="Preview"
                 className="w-full h-auto max-h-[80vh] object-contain rounded-sm"
               />
