@@ -123,7 +123,7 @@ const Services = () => {
         'Cinematic Wedding Trailer',
         '3 Reels',
         '2 Pendrive & box',
-        '1 Photographer, 1 Cinematographer & 1 Candid Photographer(Wedding & Reception Day)',
+        '1 Photographer, 1 Cinematographer & 1 Candid Photographer (Wedding & Reception Day)',
         '3 Days Coverage'
       ],
       imageIndex: 2
